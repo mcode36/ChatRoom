@@ -1,8 +1,8 @@
 'use strict';
 
 /* 
-Project Page: https://glitch.com/~narrow-parallel-lock
-Live App: https://narrow-parallel-lock.glitch.me
+Project Page: 
+Live App: 
 */
 
 const express     = require('express');
@@ -11,9 +11,9 @@ const expect      = require('chai').expect;
 const cors        = require('cors');
 const helmet = require('helmet');
 
-var apiRoutes         = require('./routes/api.js');
-var fccTestingRoutes  = require('./routes/fcctesting.js');
-var runner            = require('./test-runner');
+var apiRoutes         = require('./api.js');
+// var fccTestingRoutes  = require('./routes/fcctesting.js');
+// var runner            = require('./test-runner');
 
 var app = express();
 
@@ -46,7 +46,7 @@ app.route('/')
   });
 
 //For FCC testing purposes
-fccTestingRoutes(app);
+// fccTestingRoutes(app);
 
 //Routing for API 
 apiRoutes(app);
