@@ -1,0 +1,32 @@
+
+#logo {
+  max-width: 100px;
+  max-height: 50px;
+  transform:  translatex(20px) translatey(0px) rotate(90deg);
+}
+.hero {
+  height: 400px;
+  width: 100%;
+  background-image: url("/public/img/hero_dish1.jpg");
+  visibility: visible;
+  background-size:     cover;
+  background-repeat:   no-repeat;
+  background-position: center center;
+}
+/*
+.hero {
+  height: 400px;
+  background-color: bisque;
+  border: 1px solid burlywood;
+  overflow: hidden;
+}
+#hero-img {
+  width: 100%;
+  height: auto;
+  position: relative;
+  transform: translateY(-10%);
+}
+*/
+.banner {
+  border: 1px solid black;
+}
