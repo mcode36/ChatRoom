@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home Chef's Circle : Posts</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/public/css/style.css">
+  </head>
+  <body>
+    <header>
+      <h1 id='boardTitle'>Posts</h1>
+    </header>
+    
+    <div id='submitNewThread'>
+      <h3>Submit a new post:</h3>
+      <form id="newPost" method="post">
+        <textarea rows="8" cols="120" type='text' placeholder='Thread text...' name='text' required=''></textarea><br>
+        <input type='text' placeholder='password to delete' name='delete_password' required=''><br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+  <scripts>
+    $('#newThread').submit(function(){
+      $(this).attr('action', "/api/threads/" + currentBoard);
+    });
+  </scripts>
+  </body>
+</html>
