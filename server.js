@@ -11,7 +11,7 @@ const expect      = require('chai').expect;
 const cors        = require('cors');
 const helmet = require('helmet');
 
-var apiRoutes         = require('./api.js');
+var apiRoutes         = require('./routes/api.js');
 // var fccTestingRoutes  = require('./routes/fcctesting.js');
 // var runner            = require('./test-runner');
 
