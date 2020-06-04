@@ -243,4 +243,8 @@ module.exports = (app) => {
       });
     });
 
+    app.get('/api/posts',(req, res) => {
+      res.send('posts')
+    });
+
 };
