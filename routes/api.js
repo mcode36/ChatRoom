@@ -243,8 +243,15 @@ module.exports = (app) => {
       });
     });
 
-    app.get('/api/posts',(req, res) => {
-      res.send('posts')
-    });
+    /// New route testing
+    app.route('/api/posts')
+    .get((req, res) => {
+      res.sendFile(process.cwd() + '/views/posts.html');
+      //res.send('posts')
+    })
+    .post((req, res) => {
+      res.send('post event captured');
+    })
+
 
 };
