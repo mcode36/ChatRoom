@@ -15,13 +15,14 @@
       <form id="newPost" method="post">
         <textarea rows="8" cols="120" type='text' placeholder='Thread text...' name='text' required=''></textarea><br>
         <input type='text' placeholder='password to delete' name='delete_password' required=''><br>
-        <input type="submit" value="Submit">
+        <input id="newPost" type="submit" value="Submit">
       </form>
     </div>
-  <scripts>
-    $('#newThread').submit(function(){
+  <script>
+    var submit_form = document.findElementById('newPost');
+    submit_form.submit(function(){
       $(this).attr('action', "/api/posts/");
     });
-  </scripts>
+  </script>
   </body>
 </html>
