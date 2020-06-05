@@ -34,6 +34,23 @@
 - Any user (other than the author himself) can press 'like' to the answer.
 
 ### User Stories
+- Landing Page
+  Featured dish of the day: Random pick of theme picture, with caption, brief, author
+  When user click the picture, it will goto the recipe page of that dish
+
+- Recipes
+  - User can add new recipies. Requirements:
+    - Main picture (min requirement on resolution)
+    - Name of the dish
+    - Materials List
+      (may supply pictures)
+    - Cooking Steps
+      (may supply pictures)
+    - Final pictures (limited 4)
+    - video upload (phase 2)
+  - Like post, recipe can also accept user comments and replies
+  - Registered user can bookmark recipes
+
 - On Main page
   **Render contents**
   API route: /api/posts Method: Get
