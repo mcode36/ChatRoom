@@ -1,8 +1,11 @@
 
 #logo {
+  /*
   max-width: 100px;
   max-height: 50px;
   transform:  translatex(20px) translatey(0px) rotate(90deg);
+  */
+  max-height: 100px;
 }
 .hero {
   height: 400px;
