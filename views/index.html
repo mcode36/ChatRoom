@@ -1,29 +1,61 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Home Chef's Circle</title>
-    <!--
-    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    -->
-    <meta charset="utf-8">
+    <title>Home Chef's Corner</title>
+    <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="/public/css/style.css">
   </head>
   <body>
-    <div class="banner">
-      <img id="logo" src="/public/img/chef_logo2.jpg">
+    <div class="header">
+      <img id="logo" src="/public/img/chefHat.jpg">
     </div>
     <div class="hero">
-      <!--
-<img id="hero-img" src="/public/img/hero_dish1.jpg">
-      -->
+      <!-- image as background -->
     </div>
-    <div>
-      <p>The place for food lovers and home cooks to share and exchange their ideas.</p>
-      <button onClick="login()">Login as guest</button>
+    <div class='text-intro'>
+      <h2>Welcome to the Home Chef’s Corner, a place for food lovers to share and
+        exchange ideas about food, drinks, snacks, and more.</h2>
+      <button class='button-shadow enlarge' onClick="login()">Enter</button>
     </div>
-    <div class="register-text"></div>
+    <div class="img-row">
+      <div class="gallery">
+        <a target="_blank" href="/public/img/img600x400_restaurants.jpg">
+          <img src="/public/img/img600x400_restaurants.jpg">
+        </a>
+        <div class="desc">Restaurants</div>
+      </div>
+      
+      <div class="gallery">
+        <a target="_blank" href="/public/img/img600x400_recipes.jpg">
+          <img src="/public/img/img600x400_recipes.jpg">
+        </a>
+        <div class="desc">Recipes</div>
+      </div>
+      
+      <div class="gallery">
+        <a target="_blank" href="/public/img/img600x400_deals.jpg">
+          <img src="/public/img/img600x400_deals.jpg">
+        </a>
+        <div class="desc">Deals</div>
+      </div>
+      
+      <div class="gallery">
+        <a target="_blank" href="/public/img/img600x400_cookwares.jpg">
+          <img src="/public/img/img600x400_cookwares.jpg">
+        </a>
+        <div class="desc">Cookwares</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-item">About</div>
+      <div class="footer-item">FAQ</div>
+    </div>
 
   <script>
     function login() {
