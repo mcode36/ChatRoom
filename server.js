@@ -29,20 +29,20 @@ app.use(helmet.frameguard({ action: 'deny' }));
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
 
-//Sample front-end
-app.route('/b/:board/')
-  .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/board.html');
-  });
-app.route('/b/:board/:threadid')
-  .get(function (req, res) {
-    res.sendFile(process.cwd() + '/views/thread.html');
-  });
+
+
+
 
 //Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/index.html');
+  });
+
+//Posts page (static HTML)
+app.route('/api/posts')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/posts.html');
   });
 
 //For FCC testing purposes
