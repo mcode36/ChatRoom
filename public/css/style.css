@@ -1,16 +1,11 @@
 
 .header {
-  border: 1px solid black;
+  /* border: 1px solid black; */
   padding-top: 10px;
   padding-left: 5px;
   padding-bottom: 5px;
 }
 #logo {
-  /*
-  max-width: 100px;
-  max-height: 50px;
-  transform:  translatex(20px) translatey(0px) rotate(90deg);
-  */
   max-height: 80px;
 }
 
@@ -65,23 +60,127 @@ div.desc {
   font-family: 'Roboto', sans-serif;
   text-align: center;
 }
+
+.navbar {
+  width: 100%;
+  overflow: auto;
+  background-color: #4BA5A5;
+  font-family: 'Roboto', sans-serif;
+  color: #EEEEEE;
+}
+
+.navbar-item {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2em;
+  color: #EEEEEE;
+  margin: 15px 0px 15px 20px;
+  float: left;
+}
+.navbar-item:hover {
+  color: #BBBBBB;
+  cursor: pointer;
+}
+
+.navbar-search {
+  margin: 15px 20px 15px 0px;
+  padding: 5px 10px;
+  border: 1px solid #E5E5E5;
+  background-color: #D5D5D5;
+  width: 100px;
+  border-radius: 5px;
+  float: right;
+}
+
+.footer {
+  width: 100%;
+  overflow: auto;
+  background-color: #4BA5A5;
+}
+
+.footer-item {
+  font-family: 'Roboto', sans-serif;
+  color: #EEEEEE;
+  margin: 15px 20px 15px 0px;
+  float: right;
+  width: 50px;
+}
+.footer-item:hover {
+  color: #BBBBBB;
+  cursor: pointer;
+}
+
 .img-row {
   width: 848px;
   margin: 20px auto;
   padding: 5px;
   overflow: auto;
 }
-.footer {
-  width: 100%;
+
+/* post */
+.post {
+  border: 1px solid red;
+  width: 800px;
+  margin: 20px auto;
+  padding: 5px;
   overflow: auto;
-  background-color: #C4C4C4;
 }
-.footer-item {
-  font-family: 'Roboto', sans-serif;
-  margin: 15px 20px 15px 0px;
-  float: right;
-  width: 50px;
+.col-left{
+  width: 150px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
 }
+div.col-left img {
+  width: 100%;
+  height: auto;
+}
+.col-right {
+  width: 626px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+}
+.post-row {
+  border: 1px solid rgb(90, 106, 197);
+}
+.post-title {
+  font-size: 1.5em;
+}
+.post-content {
+  font-size: 1em;
+  height: 50px;
+}
+.post-info {
+  background-color: darkgrey;
+  overflow: auto;
+  padding: 5px 5px 5px 0px;
+}
+.post-info div {
+  float: left;
+}
+.post-avatar img{
+  width: 30px;
+  height: 30px;
+}
+.post-author {
+  margin-left: 10px;
+  width: 400px;
+}
+.post-date {
+  color: black;
+}
+.post-comments-icon img{
+  width: 25px;
+  height: 25px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+.post-comments-count {
+  color: #666666;
+}
+
+
+
 
 @media only screen and (max-width: 868px) {
   .img-row {
