@@ -1,28 +1,71 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Home Chef's Circle : Posts</title>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home Chef's Circle : Posts</title>
+    <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+    <!-- Local Stylesheet -->
     <link rel="stylesheet" href="/public/css/style.css">
   </head>
   <body>
-    <header>
-      <h1 id='boardTitle'>Posts</h1>
-    </header>
-    
-    <div id='submitNewThread'>
-      <h3>Submit a new post:</h3>
-      <form id="newPost" method="post">
-        <textarea rows="8" cols="120" type='text' placeholder='Thread text...' name='text' required=''></textarea><br>
-        <input type='text' placeholder='password to delete' name='delete_password' required=''><br>
-        <input id="newPost" type="submit" value="Submit">
-      </form>
+    <div class="header">
+      <a href="/">
+      <img id="logo" src="/public/img/chefHat.jpg">
+      </a>
     </div>
+    <div class="navbar">
+      <div class="navbar-item">Restaurants</div>
+      <div class="navbar-item">Recipes</div>
+      <div class="navbar-item">Deals</div>
+      <div class="navbar-item">Cookwares</div>
+      <div class="navbar-search">
+        Search
+      </div>
+    </div>
+
+    <div class="posts-container">
+
+      <div class="post">
+        <div class="col-left">
+          <img alt="post_image" src="/public/img/wok4.jpg">
+        </div>
+        <div class="col-right">
+          <div class="post-row post-title">
+            Not Sure How to Get Your Blog Off the Ground? Join Our New Workshop.
+          </div>
+          <div class="post-row post-content">
+            Happy Pride Month! Community is so important, especially in these times, and we invite you to join us in celebrating Out in Tech this month.
+          </div>
+          <div class="post-row post-info">
+            <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
+            <div class="post-author">Tommy Clark</div>
+            <div class="post-date">June 1, 2020</div>
+            <div class="post-comments-icon"><img alt="comment" src="/public/img/comment-icon.jpg"></div>
+            <div class="post-comments-count">5</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="post-form">
+      
+    </div>
+    <div class="bot-deco">
+
+    </div>
+    <div class="footer">
+      <div class="footer-item">About</div>
+      <div class="footer-item">FAQ</div>
+    </div>
+
   <script>
-    var submit_form = document.findElementById('newPost');
-    submit_form.submit(function(){
-      $(this).attr('action', "/api/posts/");
-    });
+
   </script>
   </body>
 </html>
