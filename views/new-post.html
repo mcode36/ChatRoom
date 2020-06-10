@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Chef's Circle : New Post</title>
+  <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body>
+  <div class="header">
+    <a href="/">
+      <img id="logo" src="/public/img/chefHat.jpg">
+    </a>
+    <div id="menu"></div>
+  </div>
+
+  <div class="divider"></div>
+
+
+
+
+  <div class="container">
+    <h2>New Post</h2>
+
+    <div class="img-strip">
+      <img id="theme-img" alt="Theme Image" src="/public/img/posts/812x200/default.jpg">
+      <div class="field_label overlay-text">Click to Add/Update Theme Image</div>
+    </div>
+
+    <div class="form-container">
+
+      <form id="pform">
+        <label class="field_label" for="v_title">Title</label>
+        <input type="text" id="v_title" name="v_title" placeholder="Title">
+
+        <label class="field_label">Category</label><br />
+        <div class="form-row">
+          <input type="checkbox" id="restaurants" name="v_category" value="restaurants" checked onclick="updateCB('0')">
+          <label class="cb_label" for="restaurants">Restaurants</label>
+          <input type="checkbox" id="recipes" name="v_category" value="recipes" onclick="updateCB('1')">
+          <label class="cb_label" for="recipes">Recipes</label>
+          <input type="checkbox" id="deals" name="v_category" value="deals" onclick="updateCB('2')">
+          <label class="cb_label" for="deals">Deals</label>
+          <input type="checkbox" id="cookwares" name="v_category" value="cookwares" onclick="updateCB('3')">
+          <label class="cb_label" for="cookwares">Cookwares</label>
+        </div>
+
+        <label class="field_label" for="v_content">Content</label>
+        <textarea id="v_content" name="new-post">
+        </textarea>
+
+        <button class="btn-shadow">Post</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-item">About</div>
+    <div class="footer-item">FAQ</div>
+  </div>
+
+  <script>
+    /* Make check box's behavior same as radio buttons */
+    function updateCB(v) {
+      const checkBoxes = ['restaurants', 'recipes', 'deals', 'cookwares'];
+      let c = document.getElementById(checkBoxes[v])
+      if (c.checked == true) {
+        console.log(checkBoxes[v], ' set to True')
+        for (i = 0; i < checkBoxes.length; i++) {
+          if (i != v) {
+            document.getElementById(checkBoxes[i]).checked = false;
+          }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
