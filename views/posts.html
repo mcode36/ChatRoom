@@ -1,71 +1,90 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home Chef's Circle : Posts</title>
-    <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
-    <!-- Local Stylesheet -->
-    <link rel="stylesheet" href="/public/css/style.css">
-  </head>
-  <body>
-    <div class="header">
-      <a href="/">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Chef's Circle : Posts</title>
+  <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body>
+  <div class="header">
+    <a href="/">
       <img id="logo" src="/public/img/chefHat.jpg">
+    </a>
+    <div id="menu"></div>
+  </div>
+  <div class="navbar">
+    <div class="navbar-item">Restaurants</div>
+    <div class="navbar-item">Recipes</div>
+    <div class="navbar-item">Deals</div>
+    <div class="navbar-item">Cookwares</div>
+    <div class="navbar-search">
+      Search All Posts
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="post">
+      <a href="/api/post_01">
+        <img class="post_image" alt="post_image" src="/public/img/posts/250x250/desert.jpg">
       </a>
-    </div>
-    <div class="navbar">
-      <div class="navbar-item">Restaurants</div>
-      <div class="navbar-item">Recipes</div>
-      <div class="navbar-item">Deals</div>
-      <div class="navbar-item">Cookwares</div>
-      <div class="navbar-search">
-        Search
-      </div>
-    </div>
-
-    <div class="posts-container">
-
-      <div class="post">
-        <div class="col-left">
-          <img alt="post_image" src="/public/img/wok4.jpg">
+      <div class="col-right">
+        <div class="post-row post-title">
+          Super Easy Homemade Churros
         </div>
-        <div class="col-right">
-          <div class="post-row post-title">
-            Not Sure How to Get Your Blog Off the Ground? Join Our New Workshop.
-          </div>
-          <div class="post-row post-content">
-            Happy Pride Month! Community is so important, especially in these times, and we invite you to join us in celebrating Out in Tech this month.
-          </div>
-          <div class="post-row post-info">
-            <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
-            <div class="post-author">Tommy Clark</div>
-            <div class="post-date">June 1, 2020</div>
+        <div class="post-row post-content">
+          We don't often feel like breaking out all of our oil to fry things. But when you have an easy churro recipe
+          this delicious, it's absolutely worth it. They only take a few minutes to fry and will actually still taste
+          good at room temp, making them a great party dessert! ....
+        </div>
+        <div class="post-row post-info">
+          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
+          <div class="post-author">Tommy Clark</div>
+          <div class="grp-right">
+            <div class="post-date">December 25, 2020</div>
             <div class="post-comments-icon"><img alt="comment" src="/public/img/comment-icon.jpg"></div>
-            <div class="post-comments-count">5</div>
+            <div class="post-comments-count">505</div>
           </div>
         </div>
       </div>
-
     </div>
 
-    <div class="post-form">
-      
-    </div>
-    <div class="bot-deco">
 
+    <div class="form-container">
+      <h2>New Post</h2>
+      <form id="pform">
+        <textarea name="new-post">
+          </textarea>
+        <button class="btn-shadow">Submit</button>
+        <button class="btn-shadow">Full Page Editor</button>
+      </form>
     </div>
-    <div class="footer">
-      <div class="footer-item">About</div>
-      <div class="footer-item">FAQ</div>
+
+    <div class="img-strip">
+      <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
     </div>
+  </div>
+  <div class="footer">
+    <div class="footer-item">About</div>
+    <div class="footer-item">FAQ</div>
+  </div>
 
   <script>
 
   </script>
-  </body>
+</body>
+
 </html>
