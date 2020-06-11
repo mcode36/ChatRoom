@@ -48,9 +48,13 @@ app.route('/api/post_01')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/view-post.html');
   });
-  app.route('/api/new-post')
+app.route('/api/new-post')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/new-post.html');
+  });
+app.route('/api/test')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/test.html');
   });
 
 //For FCC testing purposes
