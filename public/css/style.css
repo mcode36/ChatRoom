@@ -53,6 +53,7 @@ h2 {
   padding: 5px 20px;
   box-shadow: 5px 5px 5px darkgray;
 }
+
 .btn-small {
   color: #519FE7;
   border: 1px solid #E0E0E0;
@@ -64,6 +65,21 @@ h2 {
 .btn-wide {
   padding: 5px 50px;
   font-size: 1.5em;
+}
+
+.btn-fullCol {
+  width: 100%;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  background-color: #F0F0F0;
+  padding: 5px;
+  text-align: center;
+}
+
+.fullCol {
+  width: 100%;
+  padding: 10px 10px;
+  font-size: 1.4em;
 }
 
 .category-row {
@@ -161,6 +177,10 @@ div.desc {
 .container {
   width: 812px;
   margin: 20px auto;
+  overflow: auto;
+}
+.container h2 {
+  text-align: center;
 }
 .post {
   height: 170px;
@@ -183,6 +203,28 @@ div.desc {
   float: left;
   position: relative;
 }
+
+/* two column design for account.html */
+.col-left {
+  width: 250px;
+  float: left;
+  min-height: 1px;
+}
+.col-center {
+  width: 300px; 
+  float: left;
+}
+#profilePic {
+  width: 150px;
+  height: 150px;
+  margin: 0px auto;
+  background-color: lightslategray;
+}
+#profilePic:hover {
+  cursor: pointer;
+ }
+
+
 
 .post-title {
   font-family: 'Merriweather', serif;
@@ -260,7 +302,6 @@ div.desc {
 .form-container h2{
   margin-top: 2px;
   margin-bottom: 5px;
-  
 }
 
 #pform button{
@@ -290,7 +331,7 @@ div.desc {
 }
 
 .spacer {
-  height: 20px;
+  min-height: 20px;
 }
 .divider {
   height:2px;
@@ -342,4 +383,22 @@ input[type=text], textarea, .form-row {
 .cb_label {
   font-family: 'Roboto', sans-serif;
   font-size: 0.9em;
+}
+
+/* Cropper.js */
+.label {
+  cursor: pointer;
+}
+
+.progress {
+  display: none;
+  margin-bottom: 1rem;
+}
+
+.alert {
+  display: none;
+}
+
+.img-container img {
+  max-width: 100%;
 }
