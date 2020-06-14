@@ -214,6 +214,12 @@ div.desc {
   width: 300px; 
   float: left;
 }
+
+.col-center-300 {
+  margin: 0px auto;
+  width: 300px; 
+}
+
 #profilePic {
   width: 150px;
   height: 150px;
