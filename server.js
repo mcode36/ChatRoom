@@ -3,6 +3,7 @@
 
 
 const express     = require('express');
+const session = require('express-session');
 const bodyParser  = require('body-parser');
 const helmet      = require('helmet');
 const path        = require('path');
@@ -10,13 +11,18 @@ const fs          = require('fs');
 const formidable  = require('formidable');
 const readChunk   = require('read-chunk');
 const fileType    = require('file-type');
+
+// App setup
 const PORT = 3000;
+const SECRET_KEY = 'Pjd*j$ljs^jdgQhgdlP0%';
+var sess;
 
 
 
 var app = express();
 app.use('/public', express.static(process.cwd() + '/public'));
 
+app.use(session({secret: SECRET_KEY, saveUninitialized: true, resave: true}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -52,6 +58,33 @@ app.route('/api/test')
 app.route('/api/account')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/account.html');
+  });
+
+// Login
+app.route('/api/login')
+  .get(function (req, res) { 
+    // pass Login form
+    console.log('Route:/api/login ; Method: get');
+    res.sendFile(process.cwd() + '/views/login.html');
+  })
+  .post(function (req, res) {
+    // Process login form data
+    console.log('Route:/api/login ; Method: post');
+    sess = req.session;
+    sess.email = req.body.email;
+    res.sendFile(process.cwd() + '/views/posts.html');
+  })
+// Process login form data
+
+// verify login
+app.route('/api/verify_login')
+  .get(function (req, res) {
+    console.log('Route:/api/verify_login ; Method: get');
+    sess = req.session;
+    if(!sess.email) {
+        return res.redirect('/api/login');
+    }
+    res.sendFile(process.cwd() + '/views/posts.html');
   });
 
 // Image upload
