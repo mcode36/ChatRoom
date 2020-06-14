@@ -21,7 +21,7 @@
     <div class='text-intro'>
       <h2>Welcome to the Home Chef’s Corner, a place for food lovers to share and
         exchange ideas about food, drinks, snacks, and more.</h2>
-      <button class='btn-shadow btn-wide' onClick="login()">Enter</button>
+      <button class='btn-shadow btn-wide' onClick="verify_login()">Enter</button>
     </div>
     <div class="category-row">
       <div class="category">
@@ -58,8 +58,8 @@
     </div>
 
   <script>
-    function login() {
-      window.location = "/api/posts";
+    function verify_login() {
+      window.location = "/api/verify_login";
     }
   </script>
   </body>
