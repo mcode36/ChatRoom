@@ -80,10 +80,13 @@
   <div class="footer">
     <div class="footer-item">About</div>
     <div class="footer-item">FAQ</div>
+    <div class="footer-item" onClick="logout()">Logout</div>
   </div>
 
   <script>
-
+    function logout() {
+      window.location = "/api/logout";
+    }
   </script>
 </body>
 
