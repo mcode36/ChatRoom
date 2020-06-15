@@ -370,7 +370,7 @@ div.desc {
   color: gray;
 }
 
-input[type=text], textarea, .form-row {
+input, textarea, .form-row {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
