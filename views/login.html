@@ -14,6 +14,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+
   <!-- Cropper.js -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
     crossorigin="anonymous">
@@ -33,19 +36,19 @@
   <div class="divider"></div>
 
   <div class="container">
-    
+
     <div class="col-center-300">
-      
-        <form method="POST">
-          <input type="email" id="v_email" name="v_email" placeholder="Email" required>
-          <input type="password" id="v_passwd" name="v_passwd" placeholder="Password" required>
-          <button class="btn-shadow fullCol">Login</button>
-          <div>No Account Yet? <a href="/api/register">Register</a></div>
-          <div>Forgot password? <a href="/api/passwd_reset_req">Send me password reset link</a></div>
-        </form>
-      
+
+      <form id="login_form" method="POST">
+        <input type="email" id="v_email" name="v_email" placeholder="Email" required>
+        <input type="password" id="v_passwd" name="v_passwd" placeholder="Password" required>
+        <button class="btn-shadow fullCol">Login</button>
+        <div>No Account Yet? <a href="/api/register">Register</a></div>
+        <div>Forgot password? <a href="/api/passwd_reset_req">Send me password reset link</a></div>
+      </form>
+
     </div>
-    
+
   </div>
 
   <div class="spacer"></div>
@@ -53,6 +56,29 @@
     <div class="footer-item">About</div>
     <div class="footer-item">FAQ</div>
   </div>
+  <script>
+    $("#login_form").submit(function (event) {
+      event.preventDefault();
+      var $form = $(this);
+      var url = "/api/login";
+
+      /* Send the data using post with element id name and name2*/
+      var posting = $.post(url, { v_email: $('#v_email').val(), v_passwd: $('#v_passwd').val() });
+
+      /* Alerts the results */
+      posting.done(function (data) {
+        console.log(data)
+        var obj = JSON.parse(data);
+        if (obj.E) {
+          alert(obj.E);
+        }
+        else {
+          window.location.replace(obj.url);
+        }
+        
+      });
+    });
+  </script>
 </body>
 
 </html>
