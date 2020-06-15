@@ -44,7 +44,7 @@
         <input type="password" id="v_passwd" name="v_passwd" placeholder="Password" required>
         <button class="btn-shadow fullCol">Login</button>
         <div>No Account Yet? <a href="/api/register">Register</a></div>
-        <div>Forgot password? <a href="/api/passwd_reset_req">Send me password reset link</a></div>
+        <div>Forgot password? <a href="/api/passwd_reset_req">Send me password reset code</a></div>
       </form>
 
     </div>
@@ -67,15 +67,13 @@
 
       /* Alerts the results */
       posting.done(function (data) {
-        console.log(data)
         var obj = JSON.parse(data);
         if (obj.E) {
           alert(obj.E);
         }
         else {
-          window.location.replace(obj.url);
+          window.location.replace(obj.URL);
         }
-        
       });
     });
   </script>
