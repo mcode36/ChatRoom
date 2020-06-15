@@ -1,16 +1,26 @@
 'use strict';
 
+// require external libraries
+const bcrypt       = require('bcrypt');
+const randomstring = require("randomstring");
+const MongoClient  = require('mongodb').MongoClient;
+const ObjectId     = require('mongodb').ObjectId;
 
-var MongoClient = require('mongodb').MongoClient;
-var ObjectId = require('mongodb').ObjectId;
+// Global variables
 var sess;
 var db;
-const MONGODB_CONNECTION_STRING = process.env.DB;
 const db_client = new MongoClient(process.env.DB, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
 
+// Util functions
+function patch_html(html, from_str, to_str) {
+  var fs = require('fs');
+  var data = fs.readFileSync(html, 'utf8');
+  var result = data.replace(from_str, to_str);
+  return result;
+}
 
 module.exports = (app) => {
   db_client.connect((err, client) => {
@@ -34,62 +44,69 @@ module.exports = (app) => {
 
   //Index page (static HTML)
   app.route('/')
-    .get( (req, res) => {
+    .get((req, res) => {
       res.sendFile(process.cwd() + '/views/index.html');
     });
 
   //Posts page (static HTML)
   app.route('/api/posts')
-    .get( (req, res) => {
+    .get((req, res) => {
       sess = req.session;
-      if (!sess.key) {return res.redirect('/api/login');}
+      if (!sess.key) { return res.redirect('/api/login'); }
       res.sendFile(process.cwd() + '/views/posts.html');
     });
   app.route('/api/post_01')
-    .get( (req, res) => {
+    .get((req, res) => {
       res.sendFile(process.cwd() + '/views/view-post.html');
     });
   app.route('/api/new-post')
-    .get( (req, res) => {
+    .get((req, res) => {
       res.sendFile(process.cwd() + '/views/new-post.html');
     });
   app.route('/api/test')
-    .get( (req, res) => {
+    .get((req, res) => {
       res.sendFile(process.cwd() + '/views/test.html');
     });
+
+  // account page
   app.route('/api/account')
-    .get( (req, res) => {
+    .get((req, res) => {
+      sess = req.session;
+      console.log(sess)
       res.sendFile(process.cwd() + '/views/account.html');
     });
 
   // Login
   app.route('/api/login')
-    .get( (req, res) => {
+    .get((req, res) => {
       // pass Login form
       console.log('Route:/api/login ; Method: get');
       res.sendFile(process.cwd() + '/views/login.html');
     })
-    .post( (req, res) => {
+    .post((req, res) => {
       // Verify login
       console.log('Route:/api/login ; Method: post');
       let msg = '';
-      db.collection('accounts').findOne({ email: req.body.v_email },  (err, r) => {
+      db.collection('accounts').findOne({ email: req.body.v_email }, (err, r) => {
         if (err) {
           console.log("error with findOne() on route /api/login ...");
         }
         if (!r) {
-          console.log('No record found for ', req.body.v_email);
-          msg = '{"E": "No record found for: ' + req.body.v_email + '"}';
+          msg = JSON.stringify({ E: "No record found for: " + req.body.v_email });
+          //msg = '{"E": "No record found for: ' + req.body.v_email + '"}';
         }
         else {
           if (r.password == req.body.v_passwd) {
             console.log('Login successful');
-            sess = req.session;
-            sess.key = req.body.v_email;
-            console.log(sess);
-            msg = '{"url": "/api/posts"}';
+            // set session : old way
+            //sess = req.session;
+            //sess.key = req.body.v_email;
+
+            // set session: new way
+            set_session(req, req.body.v_email);
+            msg = JSON.stringify({ URL: "/api/posts" });
           } else {
-            msg = '{"E": "Password no match."}';
+            msg = JSON.stringify({ E: "Wrong password." });
           }
         }
         res.send(msg);
@@ -101,20 +118,20 @@ module.exports = (app) => {
 
   // verify login session data
   app.route('/api/verify_login')
-    .get( (req, res) => {
+    .get((req, res) => {
       console.log('Route:/api/verify_login ; Method: get');
       sess = req.session;
-      if (!sess.key) {return res.redirect('/api/login');}
+      if (!sess.key) { return res.redirect('/api/login'); }
 
       res.sendFile(process.cwd() + '/views/posts.html');
     });
 
   // register
   app.route('/api/register')
-    .get( (req, res) => {
+    .get((req, res) => {
       res.sendFile(process.cwd() + '/views/register.html');
     })
-    .post( (req, res) => {
+    .post((req, res) => {
       console.log('Route:/api/register ; Method: post');
       console.log('session data:', sess);
       // username is for display purpose
@@ -125,7 +142,7 @@ module.exports = (app) => {
         email: req.body.v_email,
         password: req.body.v_passwd
       }
-      db.collection('accounts').insertOne(obj,  (err, r) => {
+      db.collection('accounts').insertOne(obj, (err, r) => {
         if (err) {
           console.log("error inserting new record.");
         }
@@ -135,37 +152,102 @@ module.exports = (app) => {
 
   // password reset request
   app.route('/api/passwd_reset_req')
-    .get( (req, res) => {
-      res.sendFile(process.cwd() + '/views/passwd_reset_req.html');
+    .get((req, res) => {
+      let html = process.cwd() + '/views/passwd_reset_req.html';
+      if (req.query.rcode) {
+        // TODO: add req.query.email to the error message 
+        let new_html = patch_html(html, 'rcode=0', 'rcode=3')
+        res.send(new_html);
+      } else {
+        res.sendFile(html);
+      }
     })
-    .post( (req, res) => {
-      console.log('Route:/api/passwd_reset_req ; Method: post');
-      // verify reset code. If valid
-      res.sendFile(process.cwd() + '/views/account.html');
-      // if invalid, kick back to passwd_reset_req.html
 
+    .post((req, res) => {
+      console.log('Route:/api/passwd_reset_req ; Method: post');
+      let col = db.collection('accounts');
+
+      // check if account exists
+      col.findOne({ email: req.body.v_email }, (err, r) => {
+        if (err) {
+          console.log("error with findOne() on route /api/login ...");
+        }
+        if (!r) {
+          res.redirect('/api/passwd_reset_req?rcode=3&email=' + req.body.v_email)
+        }
+        else {
+          // generate random reset code
+          let resetcode = randomstring.generate({length: 6, charset: 'numeric'});
+
+          // TODO: send email
+          console.log('send to email:', req.body.v_email);
+
+          // set tmp session data
+          sess = req.session;
+          sess.cookie.maxAge = 180000; // 3 min
+          sess.tmpkey = req.body.v_email;
+          // save tmpkey to DB
+          col.updateOne({ email: req.body.v_email },
+            { $set: { tmpkey: resetcode } }, (err, r) => {
+              if (err) {
+                console.log("error updating account:", req.body.v_email);
+              } else {
+                console.log("Add resetcode successful:", req.body.v_email, " : ", resetcode);
+              }
+            });
+          res.redirect('/api/passwd_reset')
+        }
+      });
     });
 
   // password reset
   app.route('/api/passwd_reset')
-    .get( (req, res) => {
+    .get((req, res) => {
+      console.log('Route:/api/passwd_reset ; Method: get');
+      sess = req.session;
+      console.log(sess);
       res.sendFile(process.cwd() + '/views/passwd_reset.html');
     })
-    .post( (req, res) => {
-      console.log('Route:/api/passwd_reset_req ; Method: post');
-      console.log(sess);
-      res.sendFile(process.cwd() + '/views/account.html');
+    .post((req, res) => {
+      console.log('Route:/api/passwd_reset ; Method: post');
+      let msg = '';
+      let col = db.collection('accounts');
+      // check session tmpkey
+      sess = req.session;
+      if (! sess.tmpkey) {
+        console.log('session key missing. session expired?');
+        msg = JSON.stringify({ URL: '/api/passwd_reset_req' });
+        res.send(msg);
+      } else {
+        console.log('session email address:', sess.tmpkey);
+        // verify req.body.v_code with tmpkey in DB 
+        col.findOne({ email: sess.tmpkey }, (err, r) => {
+          if (err) { console.log("error on route /api/passwd_reset : findOne()");}
+          if (r.tmpkey == req.body.v_code) {
+            sess.currentuser = r.email;
+            sess.cookie.maxAge = 1800000; // 30 min
+            // TODO: destroy tmpkey in DB
+            msg = JSON.stringify({ URL: '/api/account' });
+            res.send(msg);
+          }
+          else {
+            msg = JSON.stringify({ E: "Wrong password reset code." });
+            res.send(msg);
+          }
+        });
+        
+      }
     });
 
   // logout
   app.route('/api/logout')
-    .get( (req, res) => {
+    .get((req, res) => {
       req.session.destroy();
       res.sendFile(process.cwd() + '/views/index.html');
     });
 
   // Image upload
-  app.post('/api/upload',  (req, res) => {
+  app.post('/api/upload', (req, res) => {
     var photos = [],
       form = new formidable.IncomingForm();
 
@@ -175,7 +257,7 @@ module.exports = (app) => {
     form.uploadDir = path.join(__dirname, 'tmp_uploads');
 
     // Invoked when a file has finished uploading.
-    form.on('file',  (name, file) => {
+    form.on('file', (name, file) => {
       // Allow only 3 files to be uploaded.
       if (photos.length === 3) {
         fs.unlink(file.path);
@@ -216,17 +298,17 @@ module.exports = (app) => {
       }
     });
 
-    form.on('error',  (err) => {
+    form.on('error', (err) => {
       console.log('Error occurred during processing - ' + err);
     });
 
     // Invoked when all the fields have been processed.
-    form.on('end',  () => {
+    form.on('end', () => {
       console.log('Image upload successful.');
     });
 
     // Parse the incoming form fields.
-    form.parse(req,  (err, fields, files) => {
+    form.parse(req, (err, fields, files) => {
       res.status(200).json(photos);
     });
   });
