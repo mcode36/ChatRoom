@@ -1,9 +1,7 @@
 'use strict';
 
-
-
 const express     = require('express');
-const session = require('express-session');
+const session     = require('express-session');
 const bodyParser  = require('body-parser');
 const helmet      = require('helmet');
 const path        = require('path');
@@ -17,9 +15,6 @@ var apiRoutes     = require('./routes/api.js');
 // App setup
 const SECRET_KEY = 'Pjd*j$ljs^jdgQhgdlP0%';
 
-
-
-
 var app = express();
 app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -31,9 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet.frameguard({ action: 'deny' }));
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
-
-
-
 
 // Routing for API 
 apiRoutes(app);
