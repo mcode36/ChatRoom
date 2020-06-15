@@ -1,257 +1,225 @@
 'use strict';
 
-const expect = require('chai').expect;
-const shortid = require("shortid");
 
-// mongoose
-const mongoose = require('mongoose');
-mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.set('useFindAndModify', false);
-
-const Schema = mongoose.Schema;
-//const ObjectId = Schema.ObjectId;
-const ObjectId = mongoose.Types.ObjectId;
-
-//  _id, text, created_on(date&time), bumped_on(date&time, starts same as created_on), reported(boolean), delete_password, & replies(array).
-const threadsSchema = new Schema({
-  text: { type: String, required: true },
-  created_on: { type: Date, default: Date.now },
-  bumped_on: { type: Date, default: Date.now },
-  reported: Boolean,
-  delete_password: { type: String, required: true },
-  replycount: { type: Number, default: 0 },
-  replies: [] // replies: _id, text, created_on, delete_password, & reported
+var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
+var sess;
+var db;
+const MONGODB_CONNECTION_STRING = process.env.DB;
+const db_client = new MongoClient(process.env.DB, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true
 });
 
-module.exports = (app) => {
-  /// route for threads
-  app.route('/api/threads/:board')
-    .post((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema); // use board as collection's name
-      const docInst = new Threads({
-        text: req.body.text,
-        reported: false,
-        delete_password: req.body.delete_password
-      });
 
-      docInst.save((err, data) => {
-        if (err) throw err;
-        //console.log('insert:', data);
-        res.redirect(`http://localhost:3000/b/${board}`)
-      });
+module.exports = function (app) {
+  db_client.connect((err, client) => {
+    if (err) {
+      console.log("Database error: " + err);
+    } else {
+      console.log("Successful database connection");
+    }
+    db = client.db("hcc");
+  });
 
-    })
-
-    // API test: http://localhost:3000/api/threads/general
-    .get((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-
-      // ref: https://mongoosejs.com/docs/queries.html
-      const callback = (err, data) => {
-        if (err) throw err;
-        // console.log('records found:', data.length);
-        
-        let return_array = data.map((d) => {
-          let new_d = JSON.parse(JSON.stringify(d));
-          new_d.replies = [];
-          let number_of_replies = Math.min(3,d.replies.length)
-          for(let i=0;i<number_of_replies;i++) { new_d.replies.push(d.replies.pop());}
-          // console.log(new_d.replies);
-          delete new_d.delete_password;
-          delete new_d.reported;
-          // console.log('new_d',new_d)
-          return new_d;
-        })
-
-        res.send(return_array);
+  app.get('/api/insertone', (req, res) => {
+    db.collection('test').insertOne({ dummy: 'dummy' }, function (err, r) {
+      if (err) {
+        console.log("error inserting new record.");
       }
-      Threads.find({})
-        .sort({ bumped_on: 'desc' })
-        .limit(10)
-        .exec(callback);
-    })
+      res.send('insert one');
+    });
+  });
 
-    .put((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-      const Replies = 
-      Threads.findByIdAndUpdate(
-        req.body.thread_id,
-        { reported: true },
-        (err, data) => {
-          if (err) throw err;
-          //console.log('update successful.',data)
-          res.send('success')
-        });
-    })
+//Index page (static HTML)
+app.route('/')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/index.html');
+  });
 
-    .delete((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-      Threads.findById(req.body.thread_id, (err, data) => {
-        if (err) throw err;
-        if (req.body.delete_password == data.delete_password) {
-          Threads.deleteOne({ _id: data._id }, (err, data2) => { 
-            if (err) throw err;
-            // console.log('data2 deleted:',data2)
-            res.send('success');
-          });
-        } else {
-          res.send('incorrect password');
-        }
-      });
+//Posts page (static HTML)
+app.route('/api/posts')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/posts.html');
+  });
+app.route('/api/post_01')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/view-post.html');
+  });
+app.route('/api/new-post')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/new-post.html');
+  });
+app.route('/api/test')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/test.html');
+  });
+app.route('/api/account')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/account.html');
+  });
+
+// Login
+app.route('/api/login')
+  .get(function (req, res) { 
+    // pass Login form
+    console.log('Route:/api/login ; Method: get');
+    res.sendFile(process.cwd() + '/views/login.html');
+  })
+  .post(function (req, res) {
+    // Verify login
+    console.log('Route:/api/login ; Method: post');
+    db.collection('accounts').findOne({ email: req.body.v_email }, function (err, r) {
+      if (err) {
+        console.log("error with findOne() on route /api/login ...");
+      }
+      if (r.password== req.body.v_passwd) {
+        console.log('Login successful');
+        sess = req.session;
+        sess.key = req.body.v_email;
+        console.log(sess);
+        res.sendFile(process.cwd() + '/views/posts.html');
+      } else {
+        res.json({'login':'fail'})
+      }
     });
 
-  /// route for replies
-  app.route('/api/replies/:board')
-    .post((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-      // input Fields : 'board' 'thread_id' 'text' 'delete_password'
-      let thread_id = req.body.thread_id;
-      Threads.findById(thread_id, (err, data) => {
-        if (err) throw err;
-        let db_replies = JSON.parse(JSON.stringify(data.replies));
-        let current_time = new Date();
-        //console.log('before:',db_replies,'type:',typeof db_replies)
-        let new_reply = {
-          _id: shortid.generate(),
-          text: req.body.text,
-          created_on: current_time,
-          delete_password: req.body.delete_password,
-          reported: false
-        };
-        db_replies.push(new_reply);
-        //console.log('new_reply:',new_reply);
-        //console.log('after:',db_replies);
-        Threads.findByIdAndUpdate(
-          thread_id,
-          { $set: { replies: db_replies, 
-            replycount: db_replies.length,
-            bumped_on: current_time } 
-          },
-          (err, data) => {
-            if (err) throw err;
-            //console.log(data)
-            res.redirect(`http://localhost:3000/b/${board}/${thread_id}`)
-          });
-      });
-    })
+    
+  })
+// Process login form data
 
-    // /api/replies/{board}?thread_id={thread_id}
-    .get((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-      let thread_id = req.query.thread_id;
-      // console.log('thread_id',thread_id)
-      Threads.findById(thread_id, (err, data) => {
-        if (err) throw err;
-        let new_data = JSON.parse(JSON.stringify(data));
-        delete new_data.delete_password;
-        delete new_data.reported;
-        let replies = JSON.parse(JSON.stringify(new_data.replies));
-        let new_replies = replies.map((reply) => {
-          delete reply.delete_password;
-          delete reply.reported;
-          return reply;
-        });
-        new_data.replies = new_replies;
-        // console.log('new_data:',new_data);
-        res.send(new_data);
-      });
-    })
+// verify login session data
+app.route('/api/verify_login')
+  .get(function (req, res) {
+    console.log('Route:/api/verify_login ; Method: get');
+    sess = req.session;
+    console.log(sess);
+    if(!sess.key) {
+        return res.redirect('/api/login');
+    }
+    res.sendFile(process.cwd() + '/views/posts.html');
+  });
 
-    .put((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
-      let thread_id        = req.body.thread_id;
-      let reply_id         = req.body.reply_id;
-      let return_msg       = 'unknown error updating reply';
-      
-      Threads.findById(thread_id, (err, data) => {
-        if (err) throw err;
-        let replies = JSON.parse(JSON.stringify(data.replies));
-        let changed = false;
+// register
+app.route('/api/register')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/register.html');
+  })
+  .post(function (req, res) {
+    console.log('Route:/api/register ; Method: post');
+    console.log('session data:',sess);
+    // username is for display purpose
+    // email and password are used for login validation
+    // TODO: Use Bcrypt to encrypt password
+    let obj = { 
+      username: req.body.v_uname,
+      email: req.body.v_email,
+      password: req.body.v_passwd
+    }
+    db.collection('accounts').insertOne(obj, function (err, r) {
+      if (err) {
+        console.log("error inserting new record.");
+      }
+    });
+    res.redirect('/api/login')
+  });
 
-        let new_replies = replies.map((reply) => {
-          if (reply_id == reply._id) {
-            reply.reported = true;
-            changed = true;
-          }
-          return reply;
-        });
+// password reset request
+app.route('/api/passwd_reset_req')
+  .get(function (req, res) {
+    res.sendFile(process.cwd() + '/views/passwd_reset_req.html');
+  })
+  .post(function (req, res) {
+    console.log('Route:/api/passwd_reset_req ; Method: post');
+    // verify reset code. If valid
+    res.sendFile(process.cwd() + '/views/account.html');
+    // if invalid, kick back to passwd_reset_req.html
+    
+  });
 
-        if (changed) {
-          Threads.findByIdAndUpdate(
-            thread_id,
-            { $set: { replies: new_replies } },
-            (err, data) => {
+// password reset
+app.route('/api/passwd_reset')
+.get(function (req, res) {
+  res.sendFile(process.cwd() + '/views/passwd_reset.html');
+})
+.post(function (req, res) {
+  console.log('Route:/api/passwd_reset_req ; Method: post');
+  console.log(sess);
+  res.sendFile(process.cwd() + '/views/account.html');
+});
+
+// logout
+app.route('/api/logout')
+  .get(function (req, res) {
+    req.session.destroy();
+    res.sendFile(process.cwd() + '/views/index.html');
+  });
+
+// Image upload
+app.post('/api/upload', function (req, res) {
+  var photos = [],
+      form = new formidable.IncomingForm();
+
+  // Tells formidable that there will be multiple files sent.
+  form.multiples = true;
+  // Upload directory for the images
+  form.uploadDir = path.join(__dirname, 'tmp_uploads');
+
+  // Invoked when a file has finished uploading.
+  form.on('file', function (name, file) {
+      // Allow only 3 files to be uploaded.
+      if (photos.length === 3) {
+          fs.unlink(file.path);
+          return true;
+      }
+
+      var buffer = null,
+          type = null,
+          filename = '';
+
+      buffer = readChunk.sync(file.path, 0, 262);
+      type = fileType(buffer);
+
+      // Check the file type, must be either png,jpg or jpeg
+      if (type !== null && (type.ext === 'png' || type.ext === 'jpg' || type.ext === 'jpeg')) {
+          // Assign new file name
+          filename = Date.now() + '-' + file.name;
+
+          // Move the file with the new file name
+          fs.rename(file.path, path.join(__dirname, 'uploads/' + filename), (err) => {
               if (err) throw err;
-            });
-          return_msg = 'success';
-        }
-        res.send(return_msg);
-      });
-    })
+          });
 
-    // input: thread_id, reply_id, & delete_password
-    .delete((req, res) => {
-      const board = req.params.board;
-      const Threads = mongoose.model(board, threadsSchema);
+          // Add to the list of photos
+          photos.push({
+              status: true,
+              filename: filename,
+              type: type.ext,
+              publicPath: 'uploads/' + filename
+          });
+      } else {
+          photos.push({
+              status: false,
+              filename: file.name,
+              message: 'Invalid file type'
+          });
+          fs.unlink(file.path);
+      }
+  });
 
-      let thread_id        = req.body.thread_id;
-      let reply_id         = req.body.reply_id;
-      let delete_password  = req.body.delete_password;
-      let return_msg       = 'unknown error deleting reply';
-      
-      Threads.findById(thread_id, (err, data) => {
-        if (err) throw err;
-        let replies = JSON.parse(JSON.stringify(data.replies));
-        let changed = false;
-        let new_replies = replies.map((reply) => {
-          if ( reply_id == reply._id) {
-            if (delete_password == reply.delete_password) {
-              reply.text = '[deleted]';
-              changed = true;
-              return_msg = 'success';
-            } else {
-              return_msg = 'incorrect password'; 
-            }
-          }
-          return reply;
-        })
-        if (changed) {
-          Threads.findByIdAndUpdate(
-            thread_id,
-            { $set: { replies: new_replies } },
-            (err, data) => {
-              if (err) throw err;
-            });
-        }
-        res.send(return_msg)
-      });
-    });
+  form.on('error', function(err) {
+      console.log('Error occurred during processing - ' + err);
+  });
 
-    /// backdoors, for debug purposes
-    app.get('/api/cleanAll',(req, res) => {
-      const Threads = mongoose.model('test', threadsSchema);
-      Threads.deleteMany({ }, function (err) {
-        if (err) throw err;
-        res.send('Successfully delete all records in tests')
-      });
-    });
+  // Invoked when all the fields have been processed.
+  form.on('end', function() {
+      console.log('Image upload successful.');
+  });
 
-    /// New route testing
-    app.route('/api/posts')
-    .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/posts.html');
-      //res.send('posts')
-    })
-    .post((req, res) => {
-      res.send('post event captured');
-    })
-
+  // Parse the incoming form fields.
+  form.parse(req, function (err, fields, files) {
+      res.status(200).json(photos);
+  });
+});
 
 };
