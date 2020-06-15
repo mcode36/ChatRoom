@@ -36,11 +36,11 @@
     
     <div class="col-center-300">
       
-        <form>
-          <input type="text" id="v_uname" name="v_uname" placeholder="Username">
-          <input type="text" id="v_email" name="v_email" placeholder="Email">
-          <input type="text" id="v_passwd" name="v_passwd" placeholder="Password">
-          <input type="text" id="v_passwd2" name="v_passwd2" placeholder="Confirm Password">
+        <form method="POST">
+          <input type="text" id="v_uname" name="v_uname" placeholder="Username" required>
+          <input type="email" id="v_email" name="v_email" placeholder="Email" required>
+          <input type="password" id="v_passwd" name="v_passwd" placeholder="Password" required>
+          <input type="password" id="v_passwd2" name="v_passwd2" placeholder="Confirm Password" required>
           
           <button class="btn-shadow fullCol">Register</button>
         </form>
@@ -54,6 +54,12 @@
     <div class="footer-item">About</div>
     <div class="footer-item">FAQ</div>
   </div>
+<script>
+  // TODO: need to implement level 1 form field validation 
+  // 1. v_passwd == v_passwd2 ?
+  // 
+
+</script>
 </body>
 
 </html>
