@@ -21,6 +21,7 @@
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.16",
     "nodemon": "2.0.4",
+    "nunjucks": "^3.2.1",
     "randomstring": "^1.1.5",
     "read-chunk": "^2.0.0",
     "shortid": "2.2.15",
