@@ -4,11 +4,7 @@ const express     = require('express');
 const session     = require('express-session');
 const bodyParser  = require('body-parser');
 const helmet      = require('helmet');
-const path        = require('path');
-const fs          = require('fs');
-const formidable  = require('formidable');
-const readChunk   = require('read-chunk');
-const fileType    = require('file-type');
+
 
 var apiRoutes     = require('./routes/api.js');
 
@@ -17,6 +13,7 @@ const SECRET_KEY = 'Pjd*j$ljs^jdgQhgdlP0%';
 
 var app = express();
 app.use('/public', express.static(process.cwd() + '/public'));
+app.use('/uploads', express.static(process.cwd() + '/uploads'));
 
 app.use(session({secret: SECRET_KEY, saveUninitialized: true, resave: true}));
 app.use(bodyParser.json());
