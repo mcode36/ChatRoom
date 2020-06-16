@@ -38,7 +38,7 @@
       <div class="col-left">
         <div id="profilePic">
           <label class="label" data-toggle="tooltip" title="Change your avatar">
-            <img class="rounded" id="avatar" src="https://avatars0.githubusercontent.com/u/3456749?s=160" alt="avatar">
+            <img class="rounded" id="avatar" src="http://localhost:3000/uploads/default.jpg" alt="avatar">
             <input type="file" class="sr-only" id="input" name="image" accept="image/*">
           </label>
         </div>
@@ -50,10 +50,10 @@
       <div class="col-center">
         <form>
           <label class="field_label" for="v_uname">Username</label>
-          <input type="text" id="v_uname" name="v_uname" placeholder="Username">
+          <input type="text" id="v_uname" name="v_uname" value="{{username}}">
 
           <label class="field_label" for="v_email">Email</label>
-          <input type="text" id="v_email" name="v_email" placeholder="Email">
+          <input type="text" id="v_email" name="v_email" value="{{email}}">
 
           <div class="btn-fullCol field_label">Change Password</div>
           <br />
@@ -74,7 +74,7 @@
           </div>
           <div class="modal-body">
             <div class="img-container">
-              <img id="image" src="https://avatars0.githubusercontent.com/u/3456749">
+              <img id="image" src="http://localhost:3000/uploads/default.jpg">
             </div>
           </div>
           <div class="modal-footer">
