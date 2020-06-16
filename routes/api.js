@@ -1,14 +1,24 @@
 'use strict';
 
 // require external libraries
-const bcrypt       = require('bcrypt');
+const nunjucks = require('nunjucks');
+const bcrypt = require('bcrypt');
 const randomstring = require("randomstring");
-const MongoClient  = require('mongodb').MongoClient;
-const ObjectId     = require('mongodb').ObjectId;
+const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
+
+// required by cropper
+const path        = require('path');
+const fs          = require('fs');
+const formidable  = require('formidable');
+const readChunk   = require('read-chunk');
+const fileType    = require('file-type');
 
 // Global variables
 var sess;
 var db;
+var bypass_login = true;
+
 const db_client = new MongoClient(process.env.DB, {
   useUnifiedTopology: true,
   useNewUrlParser: true
@@ -22,7 +32,10 @@ function patch_html(html, from_str, to_str) {
   return result;
 }
 
+
+
 module.exports = (app) => {
+  // Connect to database
   db_client.connect((err, client) => {
     if (err) {
       console.log("Database error: " + err);
@@ -30,6 +43,13 @@ module.exports = (app) => {
       console.log("Successful database connection");
     }
     db = client.db("hcc");
+  });
+
+  // nunjucks configuration
+  var env = nunjucks.configure(['views/'], { // set folders with templates
+    autoescape: true,
+    noCache: true, // can be set to false at production
+    express: app
   });
 
   // quick mongoDB test
@@ -45,14 +65,20 @@ module.exports = (app) => {
   //Index page (static HTML)
   app.route('/')
     .get((req, res) => {
+      if (bypass_login) {
+        sess = req.session;
+        sess.currentuser = 'mtoast@gmail.com';
+        sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
+      }
       res.sendFile(process.cwd() + '/views/index.html');
     });
 
   //Posts page (static HTML)
   app.route('/api/posts')
     .get((req, res) => {
+      console.log('Route:/api/posts ; Method: get');
       sess = req.session;
-      if (!sess.key) { return res.redirect('/api/login'); }
+      if (!sess.currentuser) { return res.redirect('/api/login'); }
       res.sendFile(process.cwd() + '/views/posts.html');
     });
   app.route('/api/post_01')
@@ -71,9 +97,20 @@ module.exports = (app) => {
   // account page
   app.route('/api/account')
     .get((req, res) => {
+      console.log('Route:/api/account ; Method: get');
+      let col = db.collection('accounts');
       sess = req.session;
-      console.log(sess)
-      res.sendFile(process.cwd() + '/views/account.html');
+      if (!sess.currentuser) { return res.redirect('/api/login'); }
+      console.log(sess.currentuser)
+      col.findOne({ email: sess.currentuser }, (err, r) => {
+        if (err) { console.log("error on route /api/account : findOne()"); }
+        let obj = {
+          username: r.username,
+          email: r.email,
+          avatar: 'default'
+        }
+        res.render('account.html', obj);
+      });
     });
 
   // Login
@@ -96,14 +133,11 @@ module.exports = (app) => {
           //msg = '{"E": "No record found for: ' + req.body.v_email + '"}';
         }
         else {
-          if (r.password == req.body.v_passwd) {
+          if (bcrypt.compareSync(req.body.v_passwd, r.password)) {
             console.log('Login successful');
-            // set session : old way
-            //sess = req.session;
-            //sess.key = req.body.v_email;
-
-            // set session: new way
-            set_session(req, req.body.v_email);
+            sess = req.session;
+            sess.currentuser = r.email;
+            sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
             msg = JSON.stringify({ URL: "/api/posts" });
           } else {
             msg = JSON.stringify({ E: "Wrong password." });
@@ -114,17 +148,6 @@ module.exports = (app) => {
 
 
     })
-  // Process login form data
-
-  // verify login session data
-  app.route('/api/verify_login')
-    .get((req, res) => {
-      console.log('Route:/api/verify_login ; Method: get');
-      sess = req.session;
-      if (!sess.key) { return res.redirect('/api/login'); }
-
-      res.sendFile(process.cwd() + '/views/posts.html');
-    });
 
   // register
   app.route('/api/register')
@@ -134,15 +157,17 @@ module.exports = (app) => {
     .post((req, res) => {
       console.log('Route:/api/register ; Method: post');
       console.log('session data:', sess);
+      let col = db.collection('accounts');
       // username is for display purpose
       // email and password are used for login validation
       // TODO: Use Bcrypt to encrypt password
+      let hashPasswd = bcrypt.hashSync(req.body.v_passwd, 8);
       let obj = {
         username: req.body.v_uname,
         email: req.body.v_email,
-        password: req.body.v_passwd
+        password: hashPasswd
       }
-      db.collection('accounts').insertOne(obj, (err, r) => {
+      col.insertOne(obj, (err, r) => {
         if (err) {
           console.log("error inserting new record.");
         }
@@ -177,14 +202,14 @@ module.exports = (app) => {
         }
         else {
           // generate random reset code
-          let resetcode = randomstring.generate({length: 6, charset: 'numeric'});
+          let resetcode = randomstring.generate({ length: 6, charset: 'numeric' });
 
           // TODO: send email
           console.log('send to email:', req.body.v_email);
 
           // set tmp session data
           sess = req.session;
-          sess.cookie.maxAge = 180000; // 3 min
+          sess.cookie.maxAge = 3 * 60 * 1000; // 3 min
           sess.tmpkey = req.body.v_email;
           // save tmpkey to DB
           col.updateOne({ email: req.body.v_email },
@@ -205,7 +230,6 @@ module.exports = (app) => {
     .get((req, res) => {
       console.log('Route:/api/passwd_reset ; Method: get');
       sess = req.session;
-      console.log(sess);
       res.sendFile(process.cwd() + '/views/passwd_reset.html');
     })
     .post((req, res) => {
@@ -214,7 +238,7 @@ module.exports = (app) => {
       let col = db.collection('accounts');
       // check session tmpkey
       sess = req.session;
-      if (! sess.tmpkey) {
+      if (!sess.tmpkey) {
         console.log('session key missing. session expired?');
         msg = JSON.stringify({ URL: '/api/passwd_reset_req' });
         res.send(msg);
@@ -222,10 +246,10 @@ module.exports = (app) => {
         console.log('session email address:', sess.tmpkey);
         // verify req.body.v_code with tmpkey in DB 
         col.findOne({ email: sess.tmpkey }, (err, r) => {
-          if (err) { console.log("error on route /api/passwd_reset : findOne()");}
+          if (err) { console.log("error on route /api/passwd_reset : findOne()"); }
           if (r.tmpkey == req.body.v_code) {
             sess.currentuser = r.email;
-            sess.cookie.maxAge = 1800000; // 30 min
+            sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
             // TODO: destroy tmpkey in DB
             msg = JSON.stringify({ URL: '/api/account' });
             res.send(msg);
@@ -235,7 +259,7 @@ module.exports = (app) => {
             res.send(msg);
           }
         });
-        
+
       }
     });
 
@@ -254,7 +278,10 @@ module.exports = (app) => {
     // Tells formidable that there will be multiple files sent.
     form.multiples = true;
     // Upload directory for the images
-    form.uploadDir = path.join(__dirname, 'tmp_uploads');
+
+    //form.uploadDir = path.join(__dirname, 'tmp_uploads');
+    form.uploadDir = process.cwd() + '/tmp_uploads';
+    console.log(form.uploadDir)
 
     // Invoked when a file has finished uploading.
     form.on('file', (name, file) => {
@@ -277,7 +304,8 @@ module.exports = (app) => {
         filename = Date.now() + '-' + file.name;
 
         // Move the file with the new file name
-        fs.rename(file.path, path.join(__dirname, 'uploads/' + filename), (err) => {
+        let new_loc = process.cwd() + '/uploads/' + filename
+        fs.rename(file.path, new_loc, (err) => {
           if (err) throw err;
         });
 
