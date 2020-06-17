@@ -14,6 +14,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- Bootstrap 
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+  integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" 
+  crossorigin="anonymous"> -->
   <!-- Local Stylesheet -->
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -23,8 +27,16 @@
     <a href="/">
       <img id="logo" src="/public/img/chefHat.jpg">
     </a>
-    <div id="menu"></div>
-  </div>
+    <!-- drop down menu-->
+    <div id="menudrop" class="dropdown">
+      <img class="avatar" src="/uploads/{{avatar}}">
+      <div class="dropdown-content">
+        <a href="/api/account">Account</a>
+        <a href="/api/logout">Logout</a>
+      </div>
+    </div>
+  </div> 
+
   <div class="navbar">
     <div class="navbar-item">Restaurants</div>
     <div class="navbar-item">Recipes</div>
@@ -70,6 +82,7 @@
         <button class="btn-shadow">Submit</button>
         <button class="btn-shadow">Full Page Editor</button>
       </form>
+
     </div>
 
     <div class="img-strip">
@@ -82,6 +95,9 @@
     <div class="footer-item" onClick="logout()">Logout</div>
   </div>
 
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
   <script>
     function logout() {
       window.location = "/api/logout";
