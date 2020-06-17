@@ -19,14 +19,52 @@ h2 {
 #logo {
   max-height: 80px;
 }
-#menu {
-  width: 30px;
-  height: 30px;
-  margin-top: 50px;
-  margin-right: 20px;
-  background-color: #4BA5A5;
-  border-radius: 5px;
+
+#menudrop {
+  width: 40px;
+  height: 40px;
+  margin-top: 40px;
+  margin-right: 0px;
+  background-color: #BBBBBB;
+  border-radius: 8px;
   float: right;
+  position: relative;
+}
+.avatar {
+  max-width:100%;
+  height: auto;
+  border-radius: 8px;
+}
+.avatar:hover {
+  cursor: pointer;
+  border: 1px solid #BBBBBB;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  margin-top: -4px;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 100px;
+  border-radius: 8px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+#menudrop:hover .dropdown-content {
+  display: block;
 }
 
 .hero {
