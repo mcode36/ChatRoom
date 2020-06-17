@@ -15,8 +15,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
   <!-- Cropper.js -->
+  <!--
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css"
     crossorigin="anonymous">
+  -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
   <link rel="stylesheet" href="/public/css/cropper.css">
   <!-- Local Stylesheet -->
   <link rel="stylesheet" href="/public/css/style.css">
@@ -27,19 +32,27 @@
     <a href="/">
       <img id="logo" src="/public/img/chefHat.jpg">
     </a>
-    <div id="menu"></div>
+    <!-- drop down menu-->
+    <div id="menudrop" class="dropdown">
+      <img id="avatar_s" class="avatar" src="/uploads/{{avatar}}">
+      <div class="dropdown-content">
+        <a href="/api/account">Account</a>
+        <a href="/api/logout">Logout</a>
+      </div>
+    </div>
   </div>
 
   <div class="divider"></div>
 
   <div class="container">
+    <div class="alert" role="alert"></div>
     <h2>Account</h2>
     <div>
       <div class="col-left">
         <div id="profilePic">
           <label class="label" data-toggle="tooltip" title="Change your avatar">
-            <img class="rounded" id="avatar" src="http://localhost:3000/uploads/default.jpg" alt="avatar">
-            <input type="file" class="sr-only" id="input" name="image" accept="image/*">
+            <img class="rounded" id="avatar" src="http://localhost:3000/uploads/{{avatar}}" alt="avatar">
+            <input type="file" class="sr-only" id="img_input" name="image" accept="image/*">
           </label>
         </div>
         <div class="progress">
@@ -55,37 +68,74 @@
           <label class="field_label" for="v_email">Email</label>
           <input type="text" id="v_email" name="v_email" value="{{email}}">
 
-          <div class="btn-fullCol field_label">Change Password</div>
+          <div class="btn-fullCol field_label" data-toggle="modal" data-target="#ChPwdModal">
+            Change Password
+          </div>
+          <!-- bootstrap style button
+            <button type="button" class="btn btn-outline-secondary col-12" data-toggle="modal" data-target="#ChPwdModal">
+            Change Password
+            </button>
+          -->
+
+
           <br />
           <button class="btn-shadow fullCol">Update</button>
         </form>
       </div>
     </div>
 
-    <div class="alert" role="alert"></div>
-    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+
+    <!-- modal for Image Crop -->
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="Modal1Label" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="modalLabel">Crop the image</h5>
+            <h5 class="modal-title" id="Modal1Label">Crop the image</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="img-container">
-              <img id="image" src="http://localhost:3000/uploads/default.jpg">
+              <img id="image" src="http://localhost:3000/uploads/{{avatar}}">
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" id="zoom_in">Zoom In</button>
             <button type="button" class="btn btn-primary" id="zoom_out">Zoom Out</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="crop">Crop</button>
+            <button type="button" class="btn btn-primary" id="crop">Set Profile Picture</button>
           </div>
         </div>
       </div>
     </div>
+    <!-- end modal for Image Crop -->
+
+    <!-- modal for change password -->
+    <div class="modal fade" id="ChPwdModal" tabindex="-1" role="dialog" aria-labelledby="Modal2Label"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="Modal2Label">Change Password</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <input type="password" id="v_passwd" name="v_passwd" placeholder="New Password" required>
+              <input type="password" id="v_passwd2" name="v_passwd2" placeholder="Confirm New Password" required>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onCLick="chgPwd()">Confirm Change</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal for change password -->
 
   </div>
 
@@ -104,10 +154,33 @@
   -->
 
   <script>
+    function chgPwd() {
+      var v_passwd = document.getElementById('v_passwd').value;
+      var v_passwd2 = document.getElementById('v_passwd2').value;
+      var $alert = $('.alert');
+      if (v_passwd != v_passwd2) {
+        $alert.show().addClass('alert-warning').text('Two entries does not match. Please try again.');
+      } else {
+        /* Ajax post */
+        let url = "/api/chgpasswd";
+        $.post(url, { v_passwd: v_passwd })
+          .done(function (data) {
+            var obj = JSON.parse(data);
+            if (obj.E) {
+              $alert.show().addClass('alert-warning').text(obj.E);
+            }
+            else {
+              $alert.show().addClass('alert-success').text(obj.S);
+            }
+          });
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
       var avatar = document.getElementById('avatar');
+      var avatar_s = document.getElementById('avatar_s');
       var image = document.getElementById('image');
-      var input = document.getElementById('input');
+      var img_input = document.getElementById('img_input');
       var $progress = $('.progress');
       var $progressBar = $('.progress-bar');
       var $alert = $('.alert');
@@ -116,10 +189,10 @@
 
       $('[data-toggle="tooltip"]').tooltip();
 
-      input.addEventListener('change', function (e) {
+      img_input.addEventListener('change', function (e) {
         var files = e.target.files;
         var done = function (url) {
-          input.value = '';
+          img_input.value = '';
           image.src = url;
           $alert.hide();
           $modal.modal('show');
@@ -177,6 +250,7 @@
           });
           initialAvatarURL = avatar.src;
           avatar.src = canvas.toDataURL();
+          avatar_s.src = canvas.toDataURL();
           $progress.show();
           $alert.removeClass('alert-success alert-warning');
           canvas.toBlob(function (blob) {
