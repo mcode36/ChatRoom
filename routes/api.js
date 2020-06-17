@@ -8,16 +8,16 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 
 // required by cropper
-const path        = require('path');
-const fs          = require('fs');
-const formidable  = require('formidable');
-const readChunk   = require('read-chunk');
-const fileType    = require('file-type');
+const path = require('path');
+const fs = require('fs');
+const formidable = require('formidable');
+const readChunk = require('read-chunk');
+const fileType = require('file-type');
 
 // Global variables
 var sess;
 var db;
-var bypass_login = true;
+var bypass_login = false;
 
 const db_client = new MongoClient(process.env.DB, {
   useUnifiedTopology: true,
@@ -72,6 +72,11 @@ module.exports = (app) => {
       }
       res.sendFile(process.cwd() + '/views/index.html');
     });
+  // About page
+  app.route('/about')
+    .get((req, res) => {
+      res.sendFile(process.cwd() + '/views/about.html');
+    });
 
   //Posts page (static HTML)
   app.route('/api/posts')
@@ -79,7 +84,18 @@ module.exports = (app) => {
       console.log('Route:/api/posts ; Method: get');
       sess = req.session;
       if (!sess.currentuser) { return res.redirect('/api/login'); }
-      res.sendFile(process.cwd() + '/views/posts.html');
+      console.log('current user:', sess.currentuser)
+      //
+      let col = db.collection('accounts');
+      col.findOne({ email: sess.currentuser }, (err, r) => {
+        if (err) { console.log("error on route /api/posts : findOne()"); }
+        let obj = {
+          username: r.username,
+          email: r.email,
+          avatar: r.avatar
+        }
+        res.render('posts.html', obj);
+      });
     });
   app.route('/api/post_01')
     .get((req, res) => {
@@ -104,10 +120,11 @@ module.exports = (app) => {
       console.log(sess.currentuser)
       col.findOne({ email: sess.currentuser }, (err, r) => {
         if (err) { console.log("error on route /api/account : findOne()"); }
+        console.log('avatar file:', r.avatar)
         let obj = {
           username: r.username,
           email: r.email,
-          avatar: 'default'
+          avatar: r.avatar
         }
         res.render('account.html', obj);
       });
@@ -145,9 +162,30 @@ module.exports = (app) => {
         }
         res.send(msg);
       });
+    });
 
-
-    })
+  // Change password
+  app.post('/api/chgpasswd', (req, res) => {
+    sess = req.session;
+    let msg = '';
+    let col = db.collection('accounts');
+    if (!sess.currentuser) {
+      msg = JSON.stringify({ E: "Session Expired." });
+      res.send(msg);
+    } else {
+      let hashPasswd = bcrypt.hashSync(req.body.v_passwd, 8);
+      col.updateOne({ email: sess.currentuser },
+        { $set: { password: hashPasswd } }, (err, r) => {
+          if (err) {
+            console.log("error updating account:", sess.currentuser);
+          } else {
+            console.log("Update password successful. Account:", sess.currentuser);
+            msg = JSON.stringify({ S: "Update password successful." });
+            res.send(msg);
+          }
+        });
+    }
+  });
 
   // register
   app.route('/api/register')
@@ -160,12 +198,12 @@ module.exports = (app) => {
       let col = db.collection('accounts');
       // username is for display purpose
       // email and password are used for login validation
-      // TODO: Use Bcrypt to encrypt password
       let hashPasswd = bcrypt.hashSync(req.body.v_passwd, 8);
       let obj = {
         username: req.body.v_uname,
         email: req.body.v_email,
-        password: hashPasswd
+        password: hashPasswd,
+        avatar: 'default'
       }
       col.insertOne(obj, (err, r) => {
         if (err) {
@@ -270,6 +308,8 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + '/views/index.html');
     });
 
+
+
   // Image upload
   app.post('/api/upload', (req, res) => {
     var photos = [],
@@ -308,6 +348,17 @@ module.exports = (app) => {
         fs.rename(file.path, new_loc, (err) => {
           if (err) throw err;
         });
+
+        // update filename to DB
+        let col = db.collection('accounts');
+        col.updateOne({ email: sess.currentuser },
+          { $set: { avatar: filename } }, (err, r) => {
+            if (err) {
+              console.log("error updating account:", sess.currentuser);
+            } else {
+              console.log("Update avatar successful:", sess.currentuser, " : ", filename);
+            }
+          });
 
         // Add to the list of photos
         photos.push({
