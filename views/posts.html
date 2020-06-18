@@ -29,9 +29,10 @@
     </a>
     <!-- drop down menu-->
     <div id="menudrop" class="dropdown">
-      <img class="avatar" src="/uploads/{{avatar}}">
+      <img class="avatar" src="/uploads/{{user.avatar}}">
       <div class="dropdown-content">
         <a href="/api/account">Account</a>
+        <a href="/api/newPost">New Post</a>
         <a href="/api/logout">Logout</a>
       </div>
     </div>
@@ -48,42 +49,30 @@
   </div>
 
   <div class="container">
-
+    {% for post in posts %}
     <div class="post">
       <a href="/api/post_01">
         <img class="post_image" alt="post_image" src="/public/img/posts/250x250/desert.jpg">
       </a>
       <div class="col-right">
         <div class="post-row post-title">
-          Super Easy Homemade Churros
+          {{post.title}}
         </div>
         <div class="post-row post-content">
-          We don't often feel like breaking out all of our oil to fry things. But when you have an easy churro recipe
-          this delicious, it's absolutely worth it. They only take a few minutes to fry and will actually still taste
-          good at room temp, making them a great party dessert! ....
+          {{post.content}}
         </div>
         <div class="post-row post-info">
-          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
-          <div class="post-author">Tommy Clark</div>
+          <div class="post-avatar"><img alt="avatar" src="/uploads/{{post.avatar}}"></div>
+          <div class="post-author">{{post.author}}</div>
           <div class="grp-right">
-            <div class="post-date">December 25, 2020</div>
+            <div class="post-date">{{post.d_string}}</div>
             <div class="post-comments-icon"><img alt="comment" src="/public/img/comment-icon.jpg"></div>
             <div class="post-comments-count">505</div>
           </div>
         </div>
       </div>
     </div>
-
-
-    <div class="form-container">
-      <h2>New Post</h2>
-      <form id="pform">
-        <textarea name="new-post"></textarea>
-        <button class="btn-shadow">Submit</button>
-        <button class="btn-shadow">Full Page Editor</button>
-      </form>
-
-    </div>
+    {% endfor %}
 
     <div class="img-strip">
       <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
