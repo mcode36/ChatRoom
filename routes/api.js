@@ -67,7 +67,7 @@ module.exports = (app) => {
     .get((req, res) => {
       if (bypass_login) {
         sess = req.session;
-        sess.currentuser = 'mtoast@gmail.com';
+        sess.authUser = { email: 'mtoast@gmail.com' };
         sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
       }
       res.sendFile(process.cwd() + '/views/index.html');
@@ -78,37 +78,105 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + '/views/about.html');
     });
 
-  //Posts page (static HTML)
+  // Posts 
   app.route('/api/posts')
     .get((req, res) => {
       console.log('Route:/api/posts ; Method: get');
       sess = req.session;
-      if (!sess.currentuser) { return res.redirect('/api/login'); }
-      console.log('current user:', sess.currentuser)
-      //
-      let col = db.collection('accounts');
-      col.findOne({ email: sess.currentuser }, (err, r) => {
-        if (err) { console.log("error on route /api/posts : findOne()"); }
-        let obj = {
-          username: r.username,
-          email: r.email,
-          avatar: r.avatar
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+
+      let col_account = db.collection('accounts');
+      let col_post = db.collection('posts');
+      col_account.find({}).toArray((err, accounts) => {
+        // build dictionary
+        let uname_dict = {};
+        let avatar_dict = {};
+        for (let i = 0; i < accounts.length; i++) {
+          uname_dict[accounts[i]._id] = accounts[i].username ;
+          avatar_dict[accounts[i]._id] = accounts[i].avatar ;
         }
-        res.render('posts.html', obj);
+        console.log('uname_dict:',uname_dict);
+        console.log('avatar_dict:',avatar_dict);
+        col_post.find({}).toArray((err, posts) => {
+          if (err) { console.log("error retrieving posts."); }
+          // post processing posts array
+          for (let i = 0; i < posts.length; i++) {
+            let d = new Date(posts[i].date);
+            let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+            posts[i]['d_string'] = d_string;
+            posts[i]['author'] = uname_dict[posts[i]['author_id']];
+            posts[i]['avatar'] = avatar_dict[posts[i]['author_id']];
+          }
+          res.render('posts.html', { user: sess.authUser, posts: posts });
+        });
       });
+
+      
+      
+        
+        /*
+        let post_processing = async () => {
+          for (let i = 0; i < posts.length; i++) {
+            let d = new Date(posts[i].date);
+            let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+            posts[i]['d_string'] = d_string;
+
+            
+            col_account.findOne({ _id: ObjectId(posts[i].author_id) }, (err, r) => {
+              if (err) { console.log("error finding id in posts : ", posts[i].author_id); }
+              posts[i]['author'] = r.username;
+              posts[i]['avatar'] = r.avatar;
+              if (i == (posts.length-1)) {
+                console.log('inside for loop:',posts)
+                return posts;
+              }
+            });
+            
+          }
+        } 
+
+        post_processing().then((data) => {
+          console.log('data:', data)
+          res.render('posts.html', { user: sess.authUser, posts: posts });
+        });
+        */
+      
     });
+
   app.route('/api/post_01')
     .get((req, res) => {
       res.sendFile(process.cwd() + '/views/view-post.html');
     });
-  app.route('/api/new-post')
+
+  // New Post
+  app.route('/api/newPost')
+
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/new-post.html');
+      //res.sendFile(process.cwd() + '/views/new_post.html');
+      console.log('Route:/api/newPost ; Method: get');
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      res.render('new_post.html', sess.authUser);
+    })
+
+    .post((req, res) => {
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+
+      let col_post = db.collection('posts');
+      let content_obj = {
+        author_id: sess.authUser.uid,
+        date: new Date(),
+        title: req.body.v_title,
+        category: req.body.v_category,
+        content: req.body.v_content
+      }
+      col_post.insertOne(content_obj, (err, r) => {
+        if (err) { console.log("error inserting new post."); }
+      });
+      res.redirect('/api/posts')
     });
-  app.route('/api/test')
-    .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/test.html');
-    });
+
 
   // account page
   app.route('/api/account')
@@ -116,18 +184,8 @@ module.exports = (app) => {
       console.log('Route:/api/account ; Method: get');
       let col = db.collection('accounts');
       sess = req.session;
-      if (!sess.currentuser) { return res.redirect('/api/login'); }
-      console.log(sess.currentuser)
-      col.findOne({ email: sess.currentuser }, (err, r) => {
-        if (err) { console.log("error on route /api/account : findOne()"); }
-        console.log('avatar file:', r.avatar)
-        let obj = {
-          username: r.username,
-          email: r.email,
-          avatar: r.avatar
-        }
-        res.render('account.html', obj);
-      });
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      res.render('account.html', sess.authUser);
     });
 
   // Login
@@ -147,13 +205,17 @@ module.exports = (app) => {
         }
         if (!r) {
           msg = JSON.stringify({ E: "No record found for: " + req.body.v_email });
-          //msg = '{"E": "No record found for: ' + req.body.v_email + '"}';
         }
         else {
           if (bcrypt.compareSync(req.body.v_passwd, r.password)) {
-            console.log('Login successful');
+            // login successful
             sess = req.session;
-            sess.currentuser = r.email;
+            sess.authUser = {
+              uid: r._id,
+              email: r.email,
+              username: r.username,
+              avatar: r.avatar
+            };
             sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
             msg = JSON.stringify({ URL: "/api/posts" });
           } else {
@@ -165,22 +227,55 @@ module.exports = (app) => {
     });
 
   // Change password
-  app.post('/api/chgpasswd', (req, res) => {
+  app.post('/api/chgPasswd', (req, res) => {
     sess = req.session;
     let msg = '';
     let col = db.collection('accounts');
-    if (!sess.currentuser) {
+    if (!sess.authUser) {
       msg = JSON.stringify({ E: "Session Expired." });
       res.send(msg);
     } else {
       let hashPasswd = bcrypt.hashSync(req.body.v_passwd, 8);
-      col.updateOne({ email: sess.currentuser },
+
+      col.updateOne({ _id: ObjectId(sess.authUser.uid) },
         { $set: { password: hashPasswd } }, (err, r) => {
           if (err) {
-            console.log("error updating account:", sess.currentuser);
+            console.log("error updating account:", sess.authUser.email);
           } else {
-            console.log("Update password successful. Account:", sess.currentuser);
+            console.log("Update password successful. Account:", sess.authUser.email);
             msg = JSON.stringify({ S: "Update password successful." });
+            res.send(msg);
+          }
+        });
+    }
+  });
+
+  // Update Account (username, email)
+  app.post('/api/acntUpdate', (req, res) => {
+    sess = req.session;
+    let msg = '';
+    let col = db.collection('accounts');
+    if (!sess.authUser) {
+      msg = JSON.stringify({ E: "Session Expired." });
+      res.send(msg);
+    } else {
+
+      col.updateOne({ _id: ObjectId(sess.authUser.uid) },
+        {
+          $set: {
+            username: req.body.v_uname,
+            email: req.body.v_email
+          }
+        }, (err, r) => {
+          if (err) {
+            console.log("error updating account:", sess.authUser.email);
+          } else {
+            if (sess.authUser.email != req.body.v_email) {
+              sess.authUser.email = req.body.v_email;
+            }
+
+            console.log("Update account successful. Account:", sess.authUser.email);
+            msg = JSON.stringify({ S: "Update successful." });
             res.send(msg);
           }
         });
@@ -194,18 +289,18 @@ module.exports = (app) => {
     })
     .post((req, res) => {
       console.log('Route:/api/register ; Method: post');
-      console.log('session data:', sess);
+
       let col = db.collection('accounts');
       // username is for display purpose
       // email and password are used for login validation
       let hashPasswd = bcrypt.hashSync(req.body.v_passwd, 8);
-      let obj = {
+      let user_obj = {
         username: req.body.v_uname,
         email: req.body.v_email,
         password: hashPasswd,
-        avatar: 'default'
+        avatar: 'default.jpg'
       }
-      col.insertOne(obj, (err, r) => {
+      col.insertOne(user_obj, (err, r) => {
         if (err) {
           console.log("error inserting new record.");
         }
@@ -249,7 +344,8 @@ module.exports = (app) => {
           sess = req.session;
           sess.cookie.maxAge = 3 * 60 * 1000; // 3 min
           sess.tmpkey = req.body.v_email;
-          // save tmpkey to DB
+          // save tmpkey to DB. Because valid session is not established yet, use
+          // email to look for account
           col.updateOne({ email: req.body.v_email },
             { $set: { tmpkey: resetcode } }, (err, r) => {
               if (err) {
@@ -286,7 +382,7 @@ module.exports = (app) => {
         col.findOne({ email: sess.tmpkey }, (err, r) => {
           if (err) { console.log("error on route /api/passwd_reset : findOne()"); }
           if (r.tmpkey == req.body.v_code) {
-            sess.currentuser = r.email;
+            sess.authUser.email = r.email;
             sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
             // TODO: destroy tmpkey in DB
             msg = JSON.stringify({ URL: '/api/account' });
@@ -312,6 +408,7 @@ module.exports = (app) => {
 
   // Image upload
   app.post('/api/upload', (req, res) => {
+    sess = req.session;
     var photos = [],
       form = new formidable.IncomingForm();
 
@@ -349,16 +446,22 @@ module.exports = (app) => {
           if (err) throw err;
         });
 
+        // update avatar in session
+        sess.authUser.avatar = filename;
+
         // update filename to DB
         let col = db.collection('accounts');
-        col.updateOne({ email: sess.currentuser },
+        col.updateOne({ _id: ObjectId(sess.authUser.uid) },
           { $set: { avatar: filename } }, (err, r) => {
             if (err) {
-              console.log("error updating account:", sess.currentuser);
+              console.log("error updating account:", sess.authUser.email);
             } else {
-              console.log("Update avatar successful:", sess.currentuser, " : ", filename);
+              console.log("Update avatar successful:", sess.authUser.email);
             }
           });
+
+
+
 
         // Add to the list of photos
         photos.push({
