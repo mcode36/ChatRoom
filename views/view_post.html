@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Chef's Circle : Posts</title>
+  <link id="favicon" rel="icon" href="/public/img/favicon.ico" type="image/x-icon">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body>
+  <div class="header">
+    <a href="/">
+      <img id="logo" src="/public/img/chefHat.jpg">
+    </a>
+    <div id="menu"></div>
+  </div>
+
+  <div class="navbar">
+    <div class="navbar-item">Restaurants</div>
+    <div class="navbar-item">Recipes</div>
+    <div class="navbar-item">Deals</div>
+    <div class="navbar-item">Cookwares</div>
+    <div class="navbar-search">
+      Search current post
+    </div>
+  </div>
+
+  <div class="img-strip">
+    <!-- default banner
+      <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
+    -->
+    <img id="bot-deco-img" alt="Bottom Decoration Image" src="/uploads/banner/{{post.banner_img}}">
+  </div>
+
+  <div class="container">
+    <div class="post-title">
+      {{post.title}}
+    </div>
+
+    <div class="row">
+      <div class="post-avatar"><img alt="avatar" src="/uploads/avatar/{{author.avatar}}"></div>
+      <div class="post-author">{{author.username}}</div>
+      <div class="grp-right">
+        <div class="post-date">{{post.d_string}}</div>
+      </div>
+      <!-- TODO: Need to add category -->
+    </div>
+
+    <div class="post-data">{{post.content}}</div>
+
+    <div class="row">
+      <button class="btn-small">Like</button> 300 people like this
+      <div class="grp-right">
+        <button class="btn-small">Edit Post</button>
+        <button class="btn-small">Delete Post</button>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="form-container">
+      <h2>Leave a comment</h2>
+      <form id="pform">
+        <textarea name="new-post">
+          </textarea>
+        <button class="btn-shadow">Submit</button>
+      </form>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider"></div>
+
+    <div class="post-data">
+      <h2>Comments</h2>
+
+      <div class="comment-wrapper">
+        <div class="row">
+          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
+          <div class="post-author">Tommy Clark</div>
+          <div class="grp-right">
+            <div class="post-date">December 25, 2020</div>
+          </div>
+        </div>
+        <div class="comments">
+          some comments here.
+        </div>
+      </div>
+
+      <div class="comment-wrapper">
+        <div class="row">
+          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
+          <div class="post-author">Tommy Clark</div>
+          <div class="grp-right">
+            <div class="post-date">December 25, 2020</div>
+          </div>
+        </div>
+        <div class="comments">
+          some comments here.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-item">About</div>
+    <div class="footer-item">FAQ</div>
+  </div>
+
+  <script>
+
+  </script>
+</body>
+
+</html>
