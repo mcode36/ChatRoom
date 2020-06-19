@@ -62,7 +62,7 @@ module.exports = (app) => {
     // About page
     app.route('/test')
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/test3.html');
+      res.sendFile(process.cwd() + '/views/test4.html');
     });
 
   //Index page (static HTML)
