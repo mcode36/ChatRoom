@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#sprite {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin-left: 306px;
+}
+</style>
+</head>
+<body>
+<div>
+  <img src="/uploads/banner/default.jpg">
+</div>
+<div>
+  <img id="sprite" src="/uploads/banner/default.jpg">
+</div>
+<button onclick="move_left()">left</button>
+<button onclick="move_right()">right</button>
+
+<script>
+var x = -306;
+var m_left = 306;
+const sprite_box = document.getElementById('sprite');
+
+function move_left() {
+  x = x + 5;
+  m_left = m_left - 5;
+  sprite_box.style.objectPosition = x.toString() + "px 0px";
+  sprite_box.style.marginLeft = m_left.toString() + "px";
+}
+function move_right() {
+  x = x - 5;
+  m_left = m_left + 5;
+  sprite_box.style.objectPosition = x.toString() + "px 0px";
+  sprite_box.style.marginLeft = m_left.toString() + "px";
+}
+</script>
+</body>
+</html>
