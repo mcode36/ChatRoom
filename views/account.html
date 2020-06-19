@@ -34,7 +34,7 @@
     </a>
     <!-- drop down menu-->
     <div id="menudrop" class="dropdown">
-      <img id="avatar_s" class="avatar" src="/uploads/{{avatar}}">
+      <img id="avatar_s" class="avatar" src="/uploads/avatar/{{avatar}}">
       <div class="dropdown-content">
         <a href="/api/account">Account</a>
         <a href="/api/posts">Posts</a>
@@ -52,7 +52,7 @@
       <div class="col-left">
         <div id="profilePic">
           <label class="label" data-toggle="tooltip" title="Change your avatar">
-            <img class="rounded" id="avatar" src="http://localhost:3000/uploads/{{avatar}}" alt="avatar">
+            <img class="rounded" id="avatar" src="/uploads/avatar/{{avatar}}" alt="avatar">
             <input type="file" class="sr-only" id="img_input" name="image" accept="image/*">
           </label>
         </div>
@@ -96,7 +96,7 @@
           </div>
           <div class="modal-body">
             <div class="img-container">
-              <img id="image" src="http://localhost:3000/uploads/{{avatar}}">
+              <img id="image" src="/uploads/avatar/{{avatar}}">
             </div>
           </div>
           <div class="modal-footer">
