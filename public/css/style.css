@@ -396,12 +396,39 @@ div.desc {
 }
 
 .img-strip {
-  width: 812px;
+  width: 800px;
   height: 200px;
   overflow: hidden;
   margin: 4px auto 4px auto;
   position: relative;
 }
+#banner_img {
+  width: 100%;
+  height: auto;
+}
+#sprite {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+}
+#spriteCtrl {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  z-index: 10;
+  border: 1px solid grey;
+  border-top-width: 0px;
+  border-bottom-width: 0px;
+  margin-top: -200px;
+}
+.bounding_box {
+  width: 800px;
+  height: 200px;
+  border: 1px solid grey;
+  position: relative;
+}
+
+
 .overlay-text {
   position: absolute;
   top: 10%;
