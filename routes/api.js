@@ -17,7 +17,6 @@ const fileType = require('file-type');
 // Global variables
 var sess;
 var db;
-var bypass_login = false;
 
 const db_client = new MongoClient(process.env.DB, {
   useUnifiedTopology: true,
@@ -31,8 +30,6 @@ function patch_html(html, from_str, to_str) {
   var result = data.replace(from_str, to_str);
   return result;
 }
-
-
 
 module.exports = (app) => {
   // Connect to database
@@ -65,11 +62,6 @@ module.exports = (app) => {
   //Index page (static HTML)
   app.route('/')
     .get((req, res) => {
-      if (bypass_login) {
-        sess = req.session;
-        sess.authUser = { email: 'mtoast@gmail.com' };
-        sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
-      }
       res.sendFile(process.cwd() + '/views/index.html');
     });
   // About page
@@ -92,11 +84,11 @@ module.exports = (app) => {
         let uname_dict = {};
         let avatar_dict = {};
         for (let i = 0; i < accounts.length; i++) {
-          uname_dict[accounts[i]._id] = accounts[i].username ;
-          avatar_dict[accounts[i]._id] = accounts[i].avatar ;
+          uname_dict[accounts[i]._id] = accounts[i].username;
+          avatar_dict[accounts[i]._id] = accounts[i].avatar;
         }
-        console.log('uname_dict:',uname_dict);
-        console.log('avatar_dict:',avatar_dict);
+        //console.log('uname_dict:',uname_dict);
+        //console.log('avatar_dict:',avatar_dict);
         col_post.find({}).toArray((err, posts) => {
           if (err) { console.log("error retrieving posts."); }
           // post processing posts array
@@ -111,41 +103,24 @@ module.exports = (app) => {
         });
       });
 
-      
-      
-        
-        /*
-        let post_processing = async () => {
-          for (let i = 0; i < posts.length; i++) {
-            let d = new Date(posts[i].date);
-            let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
-            posts[i]['d_string'] = d_string;
-
-            
-            col_account.findOne({ _id: ObjectId(posts[i].author_id) }, (err, r) => {
-              if (err) { console.log("error finding id in posts : ", posts[i].author_id); }
-              posts[i]['author'] = r.username;
-              posts[i]['avatar'] = r.avatar;
-              if (i == (posts.length-1)) {
-                console.log('inside for loop:',posts)
-                return posts;
-              }
-            });
-            
-          }
-        } 
-
-        post_processing().then((data) => {
-          console.log('data:', data)
-          res.render('posts.html', { user: sess.authUser, posts: posts });
-        });
-        */
-      
     });
 
-  app.route('/api/post_01')
+  app.route('/api/view_post/:post_id')
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/view-post.html');
+      let col_account = db.collection('accounts');
+      let col_post = db.collection('posts');
+
+      // check if account exists
+      col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
+        let d = new Date(post.date);
+        post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+        col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
+          console.log('view_post: id:',req.params.post_id)
+          console.log('user:',author)
+          console.log('post:',post)
+          res.render('view_post.html', { author: author, post: post });
+        });
+      });
     });
 
   // New Post
@@ -161,6 +136,7 @@ module.exports = (app) => {
 
     .post((req, res) => {
       sess = req.session;
+      console.log(req.body);
       if (!sess.authUser) { return res.redirect('/api/login'); }
 
       let col_post = db.collection('posts');
@@ -169,6 +145,7 @@ module.exports = (app) => {
         date: new Date(),
         title: req.body.v_title,
         category: req.body.v_category,
+        banner_img: req.body.v_banner,
         content: req.body.v_content
       }
       col_post.insertOne(content_obj, (err, r) => {
@@ -216,7 +193,7 @@ module.exports = (app) => {
               username: r.username,
               avatar: r.avatar
             };
-            sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
+            sess.cookie.maxAge = 60 * 60 * 1000; // 60 min
             msg = JSON.stringify({ URL: "/api/posts" });
           } else {
             msg = JSON.stringify({ E: "Wrong password." });
@@ -409,8 +386,10 @@ module.exports = (app) => {
   // Image upload
   app.post('/api/upload', (req, res) => {
     sess = req.session;
-    var photos = [],
-      form = new formidable.IncomingForm();
+
+    var photos = [];
+    var form = new formidable.IncomingForm();
+    var imgFor;
 
     // Tells formidable that there will be multiple files sent.
     form.multiples = true;
@@ -418,10 +397,12 @@ module.exports = (app) => {
 
     //form.uploadDir = path.join(__dirname, 'tmp_uploads');
     form.uploadDir = process.cwd() + '/tmp_uploads';
-    console.log(form.uploadDir)
 
     // Invoked when a file has finished uploading.
-    form.on('file', (name, file) => {
+    form.on('file', (fname, file) => {
+      //console.log('name:',name)
+      //console.log('file:',file)
+
       // Allow only 3 files to be uploaded.
       if (photos.length === 3) {
         fs.unlink(file.path);
@@ -441,27 +422,27 @@ module.exports = (app) => {
         filename = Date.now() + '-' + file.name;
 
         // Move the file with the new file name
-        let new_loc = process.cwd() + '/uploads/' + filename
+        let new_loc = process.cwd() + '/uploads/' + fname + '/' + filename
         fs.rename(file.path, new_loc, (err) => {
           if (err) throw err;
         });
 
+
         // update avatar in session
-        sess.authUser.avatar = filename;
+        if (fname == 'avatar') {
+          sess.authUser.avatar = filename;
 
-        // update filename to DB
-        let col = db.collection('accounts');
-        col.updateOne({ _id: ObjectId(sess.authUser.uid) },
-          { $set: { avatar: filename } }, (err, r) => {
-            if (err) {
-              console.log("error updating account:", sess.authUser.email);
-            } else {
-              console.log("Update avatar successful:", sess.authUser.email);
-            }
-          });
-
-
-
+          // update filename to DB
+          let col = db.collection('accounts');
+          col.updateOne({ _id: ObjectId(sess.authUser.uid) },
+            { $set: { avatar: filename } }, (err, r) => {
+              if (err) {
+                console.log("error updating account:", sess.authUser.email);
+              } else {
+                console.log("Update avatar successful:", sess.authUser.email);
+              }
+            });
+        }
 
         // Add to the list of photos
         photos.push({
@@ -492,6 +473,7 @@ module.exports = (app) => {
     // Parse the incoming form fields.
     form.parse(req, (err, fields, files) => {
       res.status(200).json(photos);
+      // console.log('photos(json):',photos)
     });
   });
 
