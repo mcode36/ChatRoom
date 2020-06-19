@@ -14,6 +14,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+  <!-- Cropper.js -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/public/css/cropper.css">
   <!-- Local Stylesheet -->
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -25,7 +30,7 @@
     </a>
     <!-- drop down menu-->
     <div id="menudrop" class="dropdown">
-      <img id="avatar_s" class="avatar" src="/uploads/{{avatar}}">
+      <img id="avatar_s" class="avatar" src="/uploads/avatar/{{avatar}}">
       <div class="dropdown-content">
         <a href="/api/account">Account</a>
         <a href="/api/posts">Posts</a>
@@ -40,13 +45,45 @@
     <h2>New Post</h2>
 
     <div class="img-strip">
-      <img id="theme-img" alt="Theme Image" src="/public/img/posts/812x200/default.jpg">
-      <div class="field_label overlay-text">Click to Add/Update Theme Image</div>
+      <label class="label" data-toggle="tooltip" title="Click to change banner image">
+        <img id="avatar" alt="Theme Image" src="/public/img/posts/812x200/default.jpg">
+        <!-- change id "avatar" to "banner_img" later -->
+        <div class="field_label overlay-text">Click to Add/Update Theme Image</div>
+        <input type="file" class="sr-only" id="img_input" name="image" accept="image/*">
+      </label>
     </div>
+
+    <!-- Image Crop Modal -->
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="Modal1Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="Modal1Label">Crop Banner Image</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="img-container">
+              <!-- TODO : May need to change this -->
+              <img id="image" src="/uploads/avatar/{{avatar}}">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="zoom_in">Zoom In</button>
+            <button type="button" class="btn btn-primary" id="zoom_out">Zoom Out</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="crop">Set Banner Image</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal for Image Crop -->
 
     <div class="form-container">
 
       <form id="pform" method="POST" action="/api/newPost">
+        <input type="hidden" id="v_banner" name="v_banner">
         <label class="field_label" for="v_title">Title</label>
         <input type="text" id="v_title" name="v_title" placeholder="Title">
 
@@ -64,7 +101,7 @@
 
         <label class="field_label" for="v_content">Content</label>
         <textarea id="v_content" name="v_content"></textarea>
-        
+
         <button class="btn-shadow" type="submit" value="Submit">Post</button>
       </form>
     </div>
@@ -75,8 +112,12 @@
     <div class="footer-item">FAQ</div>
   </div>
 
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <script src="/public/js/cropper.js"></script>
   <script>
-    /* Make check box's behavior same as radio buttons */
+    // Make check box's behavior same as radio buttons
     function updateCB(v) {
       const checkBoxes = ['restaurants', 'recipes', 'deals', 'cookwares'];
       let c = document.getElementById(checkBoxes[v])
@@ -89,6 +130,135 @@
         }
       }
     }
+
+    // Image Crop Model
+    window.addEventListener('DOMContentLoaded', function () {
+      var avatar = document.getElementById('avatar');
+      var avatar_s = document.getElementById('avatar_s');
+      var image = document.getElementById('image');
+      var img_input = document.getElementById('img_input');
+      var $progress = $('.progress');
+      var $progressBar = $('.progress-bar');
+      var $alert = $('.alert');
+      var $modal = $('#modal');
+      var cropper;
+
+      $('[data-toggle="tooltip"]').tooltip();
+
+      img_input.addEventListener('change', function (e) {
+        var files = e.target.files;
+        var done = function (url) {
+          img_input.value = '';
+          image.src = url;
+          $alert.hide();
+          $modal.modal('show');
+        };
+        var reader;
+        var file;
+        var url;
+
+        if (files && files.length > 0) {
+          file = files[0];
+
+          if (URL) {
+            done(URL.createObjectURL(file));
+          } else if (FileReader) {
+            reader = new FileReader();
+            reader.onload = function (e) {
+              done(reader.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      });
+
+      $modal.on('shown.bs.modal', function () {
+        cropper = new Cropper(image, {
+          aspectRatio: 4,
+          viewMode: 1,
+          minCropBoxWidth: 40
+        });
+      }).on('hidden.bs.modal', function () {
+        cropper.destroy();
+        cropper = null;
+      });
+
+      document.getElementById('zoom_in').addEventListener('click', function () {
+        if (cropper) {
+          cropper.zoom(0.1);
+        }
+      });
+      document.getElementById('zoom_out').addEventListener('click', function () {
+        if (cropper) {
+          cropper.zoom(-0.1);
+        }
+      });
+
+      document.getElementById('crop').addEventListener('click', function () {
+        var initialAvatarURL;
+        var canvas;
+
+        $modal.modal('hide');
+
+        if (cropper) {
+          canvas = cropper.getCroppedCanvas({
+            width: 1024,
+            height: 768,
+          });
+          initialAvatarURL = avatar.src;
+          avatar.src = canvas.toDataURL();
+          // for account page only. for newPost page, do not update avater image
+          // avatar_s.src = canvas.toDataURL();
+          $progress.show();
+          $alert.removeClass('alert-success alert-warning');
+          canvas.toBlob(function (blob) {
+            var formData = new FormData();
+            // formData.append('img_for', 'banner');
+            formData.append('banner', blob, 'banner.jpg');
+            $.ajax('/api/upload', {
+              method: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+
+              xhr: function () {
+                var xhr = new XMLHttpRequest();
+
+                xhr.upload.onprogress = function (e) {
+                  var percent = '0';
+                  var percentage = '0%';
+
+                  if (e.lengthComputable) {
+                    percent = Math.round((e.loaded / e.total) * 100);
+                    percentage = percent + '%';
+                    $progressBar.width(percentage).attr('aria-valuenow', percent).text(percentage);
+                  }
+                };
+
+                return xhr;
+              },
+
+              success: function (d) {
+                console.log('d:',d)
+                let banner_fname = d[0].filename ;
+                console.log('banner_fname:',banner_fname)
+                document.getElementById('v_banner').value = banner_fname;
+                $alert.show().addClass('alert-success').text('Upload success');
+              },
+
+              error: function () {
+                avatar.src = initialAvatarURL;
+                $alert.show().addClass('alert-warning').text('Upload error');
+              },
+
+              complete: function () {
+                $progress.hide();
+              },
+            });
+          });
+        }
+      });
+    });
   </script>
 </body>
 
