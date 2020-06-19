@@ -59,11 +59,18 @@ module.exports = (app) => {
     });
   });
 
+    // About page
+    app.route('/test')
+    .get((req, res) => {
+      res.sendFile(process.cwd() + '/views/test3.html');
+    });
+
   //Index page (static HTML)
   app.route('/')
     .get((req, res) => {
       res.sendFile(process.cwd() + '/views/index.html');
     });
+
   // About page
   app.route('/about')
     .get((req, res) => {
