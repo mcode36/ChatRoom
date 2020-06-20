@@ -212,12 +212,12 @@ div.desc {
 
 
 /* section: post-container */
-.container {
+.hcc_container {
   width: 812px;
   margin: 20px auto;
   overflow: auto;
 }
-.container h2 {
+.hcc_container h2 {
   text-align: center;
 }
 .post {
@@ -399,7 +399,7 @@ div.desc {
   width: 800px;
   height: 200px;
   overflow: hidden;
-  margin: 4px auto 4px auto;
+  margin: 4px auto;
   position: relative;
 }
 #banner_img {
@@ -416,14 +416,12 @@ div.desc {
   height: 200px;
   position: relative;
   z-index: 10;
-  border: 1px solid grey;
-  border-top-width: 0px;
-  border-bottom-width: 0px;
   margin-top: -200px;
 }
 .bounding_box {
-  width: 800px;
-  height: 200px;
+  width: 802px;
+  height: 202px;
+  margin: 4px auto;
   border: 1px solid grey;
   position: relative;
 }
@@ -437,7 +435,7 @@ div.desc {
   color: gray;
 }
 
-input[type=text], textarea, .form-row {
+input[type=text], input[type=email], input[type=password], textarea, .form-row {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
