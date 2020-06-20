@@ -153,6 +153,7 @@ module.exports = (app) => {
         title: req.body.v_title,
         category: req.body.v_category,
         banner_img: req.body.v_banner,
+        offset_x: req.body.v_spriteOffset,
         content: req.body.v_content
       }
       col_post.insertOne(content_obj, (err, r) => {
@@ -366,7 +367,12 @@ module.exports = (app) => {
         col.findOne({ email: sess.tmpkey }, (err, r) => {
           if (err) { console.log("error on route /api/passwd_reset : findOne()"); }
           if (r.tmpkey == req.body.v_code) {
-            sess.authUser.email = r.email;
+            sess.authUser = {
+              uid: r._id,
+              email: r.email,
+              username: r.username,
+              avatar: r.avatar
+            };
             sess.cookie.maxAge = 10 * 60 * 1000; // 10 min
             // TODO: destroy tmpkey in DB
             msg = JSON.stringify({ URL: '/api/account' });
