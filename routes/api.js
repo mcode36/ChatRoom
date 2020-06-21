@@ -59,10 +59,11 @@ module.exports = (app) => {
     });
   });
 
-    // About page
+    // Test page
     app.route('/test')
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/test4.html');
+      let html_content = '<p>paragraph 1</p><ul><li>item1</li><li>item2</li></ul><p>paragraph 2</p>'
+      res.render('tryRun/test.html', { content: html_content });
     });
 
   //Index page (static HTML)
@@ -96,7 +97,7 @@ module.exports = (app) => {
         }
         //console.log('uname_dict:',uname_dict);
         //console.log('avatar_dict:',avatar_dict);
-        col_post.find({}).toArray((err, posts) => {
+        col_post.find({}).sort({date: -1}).toArray((err, posts) => {
           if (err) { console.log("error retrieving posts."); }
           // post processing posts array
           for (let i = 0; i < posts.length; i++) {
@@ -114,6 +115,7 @@ module.exports = (app) => {
 
   app.route('/api/view_post/:post_id')
     .get((req, res) => {
+      console.log('Route:/api/view_post (get) post_id:',req.params.post_id);
       let col_account = db.collection('accounts');
       let col_post = db.collection('posts');
 
@@ -122,9 +124,8 @@ module.exports = (app) => {
         let d = new Date(post.date);
         post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
         col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
-          console.log('view_post: id:',req.params.post_id)
-          console.log('user:',author)
-          console.log('post:',post)
+          // console.log('user:',author)
+          // console.log('post:',post)
           res.render('view_post.html', { author: author, post: post });
         });
       });
@@ -143,7 +144,7 @@ module.exports = (app) => {
 
     .post((req, res) => {
       sess = req.session;
-      console.log(req.body);
+      // console.log(req.body);
       if (!sess.authUser) { return res.redirect('/api/login'); }
 
       let col_post = db.collection('posts');
