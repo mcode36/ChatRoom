@@ -2,3 +2,4 @@ node_modules
 run.bat
 package-lock.json
 work_notes.txt
+public/ckeditor
