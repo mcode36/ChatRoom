@@ -222,16 +222,18 @@ div.desc {
 }
 .post {
   height: 170px;
-  
   padding: 10px;
   border: 1px solid #B4B4B4;
   border-radius: 10px;
+  margin-bottom: 10px;
 }
 .post_image{
   width: 150px;
   height: 100%;
   float: left;
   cursor: pointer;
+  border-radius: 5px;
+  object-fit: cover;
 }
 
 .col-right {
@@ -273,14 +275,20 @@ div.desc {
 .post-title {
   font-family: 'Merriweather', serif;
   font-size: 1.5em;
+  
+}
+.post-title a:link{
+  text-decoration: none;
 }
 .post-content {
   margin-top: 5px;
   font-size: 0.9em;
-  height: 55px;
+  height: 74px;
   line-height: 1.4em;
   font-family: sans-serif;
   font-style: italic;
+  overflow: hidden;
+
 }
 .post-info {
   width: 100%;
@@ -289,6 +297,7 @@ div.desc {
   bottom: 0;
   left: 0;
   overflow: auto;
+
 }
 .post-info div {
   line-height: 25px;
