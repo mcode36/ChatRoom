@@ -50,18 +50,18 @@
 
   <div class="hcc_container">
     {% for post in posts %}
-    <div class="post"> <!-- here -->
+    <div class="post">
       <a href="/api/view_post/{{post._id}}">
         <img class="post_image" alt="post_image" 
-        style="object-fit: cover;object-position: {{post.offset_x}};"
+        style="object-position: {{post.offset_x}};"
         src="/uploads/banner/{{post.banner_img}}">
       </a>
       <div class="col-right">
         <div class="post-row post-title">
-          {{post.title}}
+          <a href="/api/view_post/{{post._id}}">{{post.title}}</a>
         </div>
         <div class="post-row post-content">
-          {{post.content}}
+          {{post.content | safe}}
         </div>
         <div class="post-row post-info">
           <div class="post-avatar"><img alt="avatar" src="/uploads/avatar/{{post.avatar}}"></div>
@@ -83,16 +83,13 @@
   <div class="footer">
     <div class="footer-item">About</div>
     <div class="footer-item">FAQ</div>
-    <div class="footer-item" onClick="logout()">Logout</div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"></script>
   <script>
-    function logout() {
-      window.location = "/api/logout";
-    }
+
   </script>
 </body>
 
