@@ -23,7 +23,15 @@
     <a href="/">
       <img id="logo" src="/public/img/chefHat.jpg">
     </a>
-    <div id="menu"></div>
+    <!-- drop down menu-->
+    <div id="menudrop" class="dropdown">
+      <img id="avatar_s" class="avatar" src="/uploads/avatar/{{author.avatar}}">
+      <div class="dropdown-content">
+        <a href="/api/account">Account</a>
+        <a href="/api/posts">Posts</a>
+        <a href="/api/logout">Logout</a>
+      </div>
+    </div>
   </div>
 
   <div class="navbar">
@@ -31,9 +39,6 @@
     <div class="navbar-item">Recipes</div>
     <div class="navbar-item">Deals</div>
     <div class="navbar-item">Cookwares</div>
-    <div class="navbar-search">
-      Search current post
-    </div>
   </div>
 
   <div class="img-strip">
@@ -57,7 +62,7 @@
       <!-- TODO: Need to add category -->
     </div>
 
-    <div class="post-data">{{post.content}}</div>
+    <div class="post-data">{{post.content | safe }}</div>
 
     <div class="row">
       <button class="btn-small">Like</button> 300 people like this
