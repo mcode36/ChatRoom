@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="/public/css/cropper.css">
   <!-- Local Stylesheet -->
   <link rel="stylesheet" href="/public/css/style.css">
+  <script src="/public/ckeditor/ckeditor.js"></script>
 </head>
 
 <body>
@@ -106,7 +107,10 @@
         </div>
 
         <label class="field_label" for="v_content">Content</label>
-        <textarea id="v_content" name="v_content"></textarea>
+        
+        <div id="editor">
+          <textarea id="v_content" name="v_content"></textarea>
+        </div>
 
         <button class="btn-shadow" type="submit" value="Submit">Post</button>
       </form>
@@ -126,6 +130,9 @@
     crossorigin="anonymous"></script>
   <script src="/public/js/cropper.js"></script>
   <script>
+    // CK Editor
+    CKEDITOR.replace( 'v_content' );
+
     // sprite control
     const spriteCtrl = document.getElementById('spriteCtrl');
     const sprite = document.getElementById('sprite');
