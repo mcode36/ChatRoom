@@ -7,7 +7,7 @@
 
 ## Page: new_post.html
 - Adjust checkbox CSS
-- Add ckeditor to Content field
+v Add CKEditor to Content field
 - Deal with default banner and sprite offset
 
 ## Page: posts.html
@@ -16,14 +16,14 @@
 - Add search function
 - Enable category filter on top nav bar
 - Update number of comments
-- Trim Title/contents to fit post window
+v Trim Title/contents to fit post window
 
 ## Page: view_post.html
 - Edit Post   (enabled when user == author)
   - Apply CKEditor to edit field
 - Delete Post (enabled when user == author)
 - Like button (enabled when user != author)
-- Add post category to display area
+v Add post category to display area
 - Comments
   - Insert new comment
   - Comment listing
