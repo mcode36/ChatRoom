@@ -1,10 +1,11 @@
 'use strict';
 
-// require external libraries
-const nunjucks = require('nunjucks');
+// required external libraries
 const bcrypt = require('bcrypt');
 const randomstring = require("randomstring");
 const MongoClient = require('mongodb').MongoClient;
+const nunjucks = require('nunjucks');
+const h2p = require('html2plaintext')
 const ObjectId = require('mongodb').ObjectId;
 
 // required by cropper
@@ -101,9 +102,20 @@ module.exports = (app) => {
           if (err) { console.log("error retrieving posts."); }
           // post processing posts array
           for (let i = 0; i < posts.length; i++) {
+            // post processing date field
             let d = new Date(posts[i].date);
             let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
             posts[i]['d_string'] = d_string;
+            // post processing content field
+            let text = '', x = 0;
+            let t = h2p(posts[i].content).split(' ');
+            while (true) {
+              text = text + t[x] + ' ';
+              x += 1;
+              if (x >= t.length ) { break; }
+              if (text.length > 220) { text = text + '...'; break; }
+            }
+            posts[i]['plain_text'] = text;
             posts[i]['author'] = uname_dict[posts[i]['author_id']];
             posts[i]['avatar'] = avatar_dict[posts[i]['author_id']];
           }
@@ -113,13 +125,13 @@ module.exports = (app) => {
 
     });
 
+  // View Post
   app.route('/api/view_post/:post_id')
     .get((req, res) => {
       console.log('Route:/api/view_post (get) post_id:',req.params.post_id);
       let col_account = db.collection('accounts');
       let col_post = db.collection('posts');
 
-      // check if account exists
       col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
         let d = new Date(post.date);
         post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
@@ -133,12 +145,11 @@ module.exports = (app) => {
 
   // New Post
   app.route('/api/newPost')
-
     .get((req, res) => {
-      //res.sendFile(process.cwd() + '/views/new_post.html');
       console.log('Route:/api/newPost ; Method: get');
       sess = req.session;
       if (!sess.authUser) { return res.redirect('/api/login'); }
+      console.log(sess.authUser)
       res.render('new_post.html', sess.authUser);
     })
 
@@ -163,6 +174,25 @@ module.exports = (app) => {
       res.redirect('/api/posts')
     });
 
+    // Edit Post
+    app.route('/api/editPost/:post_id')
+    .get((req, res) => {
+      console.log('Route:/api/editPost (get) post_id:',req.params.post_id);
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      let col_account = db.collection('accounts');
+      let col_post = db.collection('posts');
+
+      col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
+        let d = new Date(post.date);
+        post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+        col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
+          // console.log('user:',author)
+          // console.log('post:',post)
+          res.render('new_post.html', { author: author, post: post });
+        });
+      });
+    });
 
   // account page
   app.route('/api/account')
