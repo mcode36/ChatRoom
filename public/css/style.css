@@ -318,9 +318,16 @@ div.desc {
   margin-left: 5px;
   font-family: 'Shadows Into Light', cursive;
 }
+
 .post-stat {
   overflow: auto;
   float: left;
+}
+.post-category {
+  line-height: 25px;
+  float: left;
+  margin-right: 0px;
+  font-family: 'Bentham', serif;
 }
 .post-date {
   line-height: 25px;
