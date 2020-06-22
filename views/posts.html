@@ -61,7 +61,7 @@
           <a href="/api/view_post/{{post._id}}">{{post.title}}</a>
         </div>
         <div class="post-row post-content">
-          {{post.content | safe}}
+          {{post.plain_text}}
         </div>
         <div class="post-row post-info">
           <div class="post-avatar"><img alt="avatar" src="/uploads/avatar/{{post.avatar}}"></div>
