@@ -17,6 +17,7 @@
     "file-type": "^3.9.0",
     "formidable": "^1.0.17",
     "helmet": "^3.21.3",
+    "html2plaintext": "^2.1.2",
     "mocha": "^7.1.1",
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.16",
