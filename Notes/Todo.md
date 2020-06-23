@@ -1,14 +1,15 @@
-## Page: account.html
+# Section 1 : Major functions and routes
 
-- User can manage avatar
-  - switch to use existing avatar
-  - delete avatar
-- Add bounding bax around first part: Username/Email/Update My Account Info
-
-## Page: new_post.html
-- Adjust checkbox CSS
-v Add CKEditor to Content field
-- Deal with default banner and sprite offset
+## Page: view_post.html
+v Edit Post
+  v enable Edit button when user == author
+  v Apply CKEditor to edit field
+v Delete Post (enabled when user == author)
+- Like button (enabled when user != author)
+v Add post category to display area
+- Comments
+  - Insert new comment
+  - Comment listing
 
 ## Page: posts.html
 - Add pagination
@@ -18,16 +19,15 @@ v Add CKEditor to Content field
 - Update number of comments
 v Trim Title/contents to fit post window
 
-## Page: view_post.html
-- Edit Post   (enabled when user == author)
-  - Apply CKEditor to edit field
-- Delete Post (enabled when user == author)
-- Like button (enabled when user != author)
-v Add post category to display area
-- Comments
-  - Insert new comment
-  - Comment listing
+# Section 2 : Final touch on CSS
 
+## Page: new_post.html
+- Adjust checkbox CSS
+v Add CKEditor to Content field
+v Deal with default banner and sprite offset
+
+## Page: account.html
+- Add bounding bax around first part: Username/Email/Update My Account Info
 
 ## Form
 - Make unique look for all input fields
@@ -39,3 +39,6 @@ v Add post category to display area
 ## New feature: Crop utility
 ## New feature: User admin page
 ## New feature: Edit category items
+## New feature: - User can manage avatar
+  - switch to use existing avatar
+  - delete avatar
