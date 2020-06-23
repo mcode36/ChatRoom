@@ -60,11 +60,10 @@ module.exports = (app) => {
     });
   });
 
-    // Test page
-    app.route('/test')
+  // Test page
+  app.route('/test')
     .get((req, res) => {
-      let html_content = '<p>paragraph 1</p><ul><li>item1</li><li>item2</li></ul><p>paragraph 2</p>'
-      res.render('tryRun/test.html', { content: html_content });
+      res.sendFile(process.cwd() + '/views/tryRun/test_modal.html');
     });
 
   //Index page (static HTML)
@@ -98,7 +97,7 @@ module.exports = (app) => {
         }
         //console.log('uname_dict:',uname_dict);
         //console.log('avatar_dict:',avatar_dict);
-        col_post.find({}).sort({date: -1}).toArray((err, posts) => {
+        col_post.find({}).sort({ date: -1 }).toArray((err, posts) => {
           if (err) { console.log("error retrieving posts."); }
           // post processing posts array
           for (let i = 0; i < posts.length; i++) {
@@ -112,12 +111,17 @@ module.exports = (app) => {
             while (true) {
               text = text + t[x] + ' ';
               x += 1;
-              if (x >= t.length ) { break; }
+              if (x >= t.length) { break; }
               if (text.length > 220) { text = text + '...'; break; }
             }
+            // post processing object_position_style
+            posts[i]['object_position_style'] = 'object-position:' + posts[i]['spriteOffset'] + 'px 0px';
+
+            // post processing other variables
             posts[i]['plain_text'] = text;
             posts[i]['author'] = uname_dict[posts[i]['author_id']];
             posts[i]['avatar'] = avatar_dict[posts[i]['author_id']];
+
           }
           res.render('posts.html', { user: sess.authUser, posts: posts });
         });
@@ -128,13 +132,18 @@ module.exports = (app) => {
   // View Post
   app.route('/api/view_post/:post_id')
     .get((req, res) => {
-      console.log('Route:/api/view_post (get) post_id:',req.params.post_id);
+      console.log('Route:/api/view_post (get) post_id:', req.params.post_id);
       let col_account = db.collection('accounts');
       let col_post = db.collection('posts');
 
       col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
         let d = new Date(post.date);
         post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+        // post.isOwner
+        post.isOwner = false;
+        if (post.author_id == sess.authUser.uid) {
+          post.isOwner = true;
+        }
         col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
           // console.log('user:',author)
           // console.log('post:',post)
@@ -149,8 +158,20 @@ module.exports = (app) => {
       console.log('Route:/api/newPost ; Method: get');
       sess = req.session;
       if (!sess.authUser) { return res.redirect('/api/login'); }
-      console.log(sess.authUser)
-      res.render('new_post.html', sess.authUser);
+
+      // res.render('new_post.html', sess.authUser);
+
+      let post = {
+        caption: 'New Post',
+        submit_button_text: 'Post',
+        form_action: '/api/newPost/',
+        banner_img: 'default.jpg',
+        spriteOffset: -221,
+        title: '',
+        category: 'restaurants',
+        content: ''
+      }
+      res.render('new_post.html', { author: sess.authUser, post: post });
     })
 
     .post((req, res) => {
@@ -165,7 +186,7 @@ module.exports = (app) => {
         title: req.body.v_title,
         category: req.body.v_category,
         banner_img: req.body.v_banner,
-        offset_x: req.body.v_spriteOffset,
+        spriteOffset: req.body.v_spriteOffset,
         content: req.body.v_content
       }
       col_post.insertOne(content_obj, (err, r) => {
@@ -174,24 +195,70 @@ module.exports = (app) => {
       res.redirect('/api/posts')
     });
 
-    // Edit Post
-    app.route('/api/editPost/:post_id')
+
+
+  // Edit Post
+  app.route('/api/editPost/:post_id')
     .get((req, res) => {
-      console.log('Route:/api/editPost (get) post_id:',req.params.post_id);
+      console.log('Route:/api/editPost (get) post_id:', req.params.post_id);
       sess = req.session;
       if (!sess.authUser) { return res.redirect('/api/login'); }
       let col_account = db.collection('accounts');
       let col_post = db.collection('posts');
 
       col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
-        let d = new Date(post.date);
-        post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+        post.caption = 'Edit Post';
+        post.submit_button_text = 'Update';
+        post.form_action = '/api/editPost/' + req.params.post_id;
         col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
-          // console.log('user:',author)
-          // console.log('post:',post)
           res.render('new_post.html', { author: author, post: post });
         });
       });
+    })
+    .post((req, res) => {
+      console.log('Route:/api/editPost (get) post_id:', req.params.post_id);
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+
+      let col_post = db.collection('posts');
+      let content_obj = {
+        author_id: sess.authUser.uid,
+        date: new Date(),
+        title: req.body.v_title,
+        category: req.body.v_category,
+        banner_img: req.body.v_banner,
+        spriteOffset: req.body.v_spriteOffset,
+        content: req.body.v_content
+      }
+
+      col_post.updateOne({ _id: ObjectId(req.params.post_id) },
+        { $set: content_obj }, (err, r) => {
+          if (err) {
+            console.log("error updating post:", req.params.post_id);
+          } else {
+            console.log("Update post successful:", req.params.post_id);
+          }
+        });
+      res.redirect('/api/posts')
+    });
+
+  // Delete Post
+  app.route('/api/delPost')
+    .post((req, res) => {
+      console.log('Route:/api/delPost (post)');
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      let col_post = db.collection('posts');
+      col_post.findOne({ _id: ObjectId(req.body.post_id) }, (err, post) => {
+        if (post.author_id == sess.authUser.uid) {
+          col_post.deleteOne({ _id: ObjectId(req.body.post_id) }, (err, r) => {
+            if (err) { console.log("error deleting post:", req.body.post_id); }
+          });
+        } else {
+          console.log("Not post owner error. Post not deleted");
+        }
+      });
+      res.redirect('/api/posts');
     });
 
   // account page
