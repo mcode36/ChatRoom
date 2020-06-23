@@ -48,12 +48,13 @@
     </div>
   </div>
 
+  
   <div class="hcc_container">
     {% for post in posts %}
     <div class="post">
       <a href="/api/view_post/{{post._id}}">
         <img class="post_image" alt="post_image" 
-        style="object-position: {{post.offset_x}};"
+		    style="{{post.object_position_style}}"
         src="/uploads/banner/{{post.banner_img}}">
       </a>
       <div class="col-right">
