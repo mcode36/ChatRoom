@@ -19,6 +19,9 @@ v Add post category to display area
 - Update number of comments
 v Trim Title/contents to fit post window
 
+## Image upload
+- disable multiple file upload (redundant)
+
 # Section 2 : Final touch on CSS
 
 ## Page: new_post.html
@@ -28,6 +31,9 @@ v Deal with default banner and sprite offset
 
 ## Page: account.html
 - Add bounding bax around first part: Username/Email/Update My Account Info
+
+## Page: register.html
+- Add field labels
 
 ## Form
 - Make unique look for all input fields
