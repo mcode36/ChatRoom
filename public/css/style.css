@@ -491,7 +491,7 @@ input[type=text], input[type=email], input[type=password], textarea, .form-row {
 }
 
 /* The Modal (background) */
-.modal {
+.mmodal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -506,7 +506,7 @@ input[type=text], input[type=email], input[type=password], textarea, .form-row {
 }
 
 /* Modal Content */
-.modal-content {
+.mmodal-content {
   position: relative;
   background-color: #fefefe;
   margin: auto;
@@ -533,20 +533,20 @@ input[type=text], input[type=email], input[type=password], textarea, .form-row {
 }
 
 /* The Close Button */
-.modal-close {
+.mmodal-close {
   color: white;
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
-.modal-close:hover,
-.modal-close:focus {
+.mmodal-close:hover,
+.mmodal-close:focus {
   color: #000;
   text-decoration: none;
   cursor: pointer;
 }
 
-.modal-header {
+.mmodal-header {
   padding: 2px 16px;
   background-color: #df72cd;
   border-top-left-radius: 6px;
@@ -554,13 +554,13 @@ input[type=text], input[type=email], input[type=password], textarea, .form-row {
   color: white;
 }
 
-.modal-body {padding: 2px 16px;}
+.mmodal-body {padding: 2px 16px;}
 
-.modal-footer {
+.mmodal-footer {
   padding: 15px 16px;
   color: white;
   overflow: auto;
 }
-.modal-footer button{
+.mmodal-footer button{
   float: right;
 }
