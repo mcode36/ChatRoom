@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Solway&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bentham&display=swap" rel="stylesheet">
+
   <!-- Local Stylesheet -->
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -56,23 +57,51 @@
     <div class="row">
       <div class="post-avatar"><img alt="avatar" src="/uploads/avatar/{{author.avatar}}"></div>
       <div class="post-author">{{author.username}}</div>
-      
+
       <div class="grp-right">
         <div class="post-date">{{post.d_string}}</div>
         <div class="post-category">/ {{post.category}}</div>
-        
+
       </div>
     </div>
 
     <div class="post-data">{{post.content | safe }}</div>
 
     <div class="row">
-      <button class="btn-small">Like</button> 300 people like this
+      {% if not post.isOwner %}
+      <button class="btn-small">Like</button>
+      {% endif %}
+      300 people like this
+      {% if post.isOwner %}
       <div class="grp-right">
-        <button class="btn-small" onCLick="editPost()">Edit Post</button>
-        <button class="btn-small">Delete Post</button>
+        <button class="btn-small" onClick="editPost()">Edit Post</button>
+        <button class="btn-small" onClick="delPostModal()">Delete Post</button>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Delete Modal -->
+    {% if post.isOwner %}
+    <div id="delModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-close">&times;</span>
+          <h2>Confirm Delete</h2>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the post titled <strong>{{post.title}}</strong> ?</p>
+        </div>
+        <div class="modal-footer">
+          <form id="delForm" method="POST" action="/api/delPost">
+            <input name="post_id" type="hidden" value={{post._id}}>
+            <button class="btn-small" onClick="delPost()">Confirm</button>
+          </form>
+        </div>
       </div>
     </div>
+    {% endif %}
+    <!-- End Delete Modal -->
 
     <div class="spacer"></div>
 
@@ -128,11 +157,35 @@
   </div>
 
   <script>
-function editPost() {
-  let post_id = document.getElementById('post_id').value;
-  let url = '/api/editPost/' + post_id;
-  window.location=url;
-}
+    const post_id = document.getElementById('post_id').value;
+    function editPost() {
+      let url = '/api/editPost/' + post_id;
+      window.location = url;
+    }
+
+    // Model visual control
+    // Get the modal
+    var modal = document.getElementById("delModal");
+
+    // Get the <span> element that closes the modal
+    var modal_close_icon = document.getElementsByClassName("modal-close")[0];
+
+    // When the user clicks the button, open the modal 
+    function delPostModal() {
+      modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    modal_close_icon.onclick = function () {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close the modal
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
   </script>
 </body>
 
