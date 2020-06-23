@@ -150,6 +150,41 @@ module.exports = (app) => {
           res.render('view_post.html', { author: author, post: post });
         });
       });
+    })
+
+    .put((req, res) => { // handle likes
+      console.log('Route:/api/view_post (put) post_id:', req.params.post_id);
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      let col_post = db.collection('posts');
+
+      col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
+        if (!post.likes_by.includes(sess.authUser.username)) {
+          post.likes_by.push(sess.authUser.username);
+          let likes_obj = {
+            n_likes: post.n_likes + 1,
+            likes_by: post.likes_by
+          }
+          col_post.updateOne({ _id: ObjectId(req.params.post_id) },
+          { $set: likes_obj }, (err, r) => {
+            if (err) {
+              console.log("error updating post");
+            } else {
+              console.log("Update post successful. number of likes: ", likes_obj.n_likes);
+              res.json(likes_obj);
+              // respond with successful flag. So ajax on client end can disable the button and change text to
+              // 'I liked this'
+              // additionally, on viewPost(get), add filter to determine if like button should be enabled
+            }
+          });
+          
+        } else {
+          // already liked
+          // on client end 
+          res.json({n_likes: 99999})
+        }
+        
+      });
     });
 
   // New Post
@@ -187,7 +222,9 @@ module.exports = (app) => {
         category: req.body.v_category,
         banner_img: req.body.v_banner,
         spriteOffset: req.body.v_spriteOffset,
-        content: req.body.v_content
+        content: req.body.v_content,
+        n_likes: 0,
+        likes_by: []
       }
       col_post.insertOne(content_obj, (err, r) => {
         if (err) { console.log("error inserting new post."); }
