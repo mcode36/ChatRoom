@@ -5,7 +5,7 @@ v Edit Post
   v enable Edit button when user == author
   v Apply CKEditor to edit field
 v Delete Post (enabled when user == author)
-- Like button (enabled when user != author)
+v Like button (enabled when user != author)
 v Add post category to display area
 - Comments
   - Insert new comment
