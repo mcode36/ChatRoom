@@ -61,9 +61,19 @@ module.exports = (app) => {
   });
 
   // Test page
-  app.route('/test')
+  app.route('/test/:post_id')
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/tryRun/test_modal.html');
+      //res.sendFile(process.cwd() + '/views/tryRun/test_modal.html');
+
+      let col_post = db.collection('posts');
+      col_post.updateOne({ _id: ObjectId(req.params.post_id) },
+        { $set: { n_likes: 0, likes_by: [] } }, (err, r) => {
+          if (err) { console.log("error updating post"); }
+          else {
+            console.log("reset likes to 0");
+            res.send('reset likes to 0')
+          }
+        });
     });
 
   //Index page (static HTML)
@@ -95,8 +105,7 @@ module.exports = (app) => {
           uname_dict[accounts[i]._id] = accounts[i].username;
           avatar_dict[accounts[i]._id] = accounts[i].avatar;
         }
-        //console.log('uname_dict:',uname_dict);
-        //console.log('avatar_dict:',avatar_dict);
+        
         col_post.find({}).sort({ date: -1 }).toArray((err, posts) => {
           if (err) { console.log("error retrieving posts."); }
           // post processing posts array
@@ -135,21 +144,45 @@ module.exports = (app) => {
       console.log('Route:/api/view_post (get) post_id:', req.params.post_id);
       let col_account = db.collection('accounts');
       let col_post = db.collection('posts');
-
-      col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
-        let d = new Date(post.date);
-        post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
-        // post.isOwner
-        post.isOwner = false;
-        if (post.author_id == sess.authUser.uid) {
-          post.isOwner = true;
+      col_account.find({}).toArray((err, accounts) => {
+        // build dictionary
+        let uname_dict = {};
+        let avatar_dict = {};
+        for (let i = 0; i < accounts.length; i++) {
+          uname_dict[accounts[i]._id] = accounts[i].username;
+          avatar_dict[accounts[i]._id] = accounts[i].avatar;
         }
-        col_account.findOne({ _id: ObjectId(post.author_id) }, (err, author) => {
-          // console.log('user:',author)
-          // console.log('post:',post)
-          res.render('view_post.html', { author: author, post: post });
+
+        col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
+          let d = new Date(post.date);
+          post.d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+          // post.isOwner
+          post.isOwner = false;
+          if (post.author_id == sess.authUser.uid) {
+            post.isOwner = true;
+          }
+          // post.already_liked
+          post.already_liked = false;
+          if (post.likes_by.includes(sess.authUser.username)) {
+            post.already_liked = true;
+          }
+          // author username and avatar 
+          post.author_username = uname_dict[post.author_id];
+          post.author_avatar = avatar_dict[post.author_id];
+          // comments
+          for (let i = 0; i < post.comments.length; i++) {
+            post.comments[i].username = uname_dict[post.comments[i].by_id];
+            post.comments[i].avatar = avatar_dict[post.comments[i].by_id];
+          }
+          res.render('view_post.html', { user: sess.authUser, post: post });
+
+          
         });
       });
+
+
+      
+
     })
 
     .put((req, res) => { // handle likes
@@ -159,31 +192,21 @@ module.exports = (app) => {
       let col_post = db.collection('posts');
 
       col_post.findOne({ _id: ObjectId(req.params.post_id) }, (err, post) => {
-        if (!post.likes_by.includes(sess.authUser.username)) {
-          post.likes_by.push(sess.authUser.username);
-          let likes_obj = {
-            n_likes: post.n_likes + 1,
-            likes_by: post.likes_by
-          }
-          col_post.updateOne({ _id: ObjectId(req.params.post_id) },
+
+        post.likes_by.push(sess.authUser.username);
+        let likes_obj = {
+          n_likes: post.n_likes + 1,
+          likes_by: post.likes_by
+        }
+        col_post.updateOne({ _id: ObjectId(req.params.post_id) },
           { $set: likes_obj }, (err, r) => {
             if (err) {
               console.log("error updating post");
             } else {
               console.log("Update post successful. number of likes: ", likes_obj.n_likes);
-              res.json(likes_obj);
-              // respond with successful flag. So ajax on client end can disable the button and change text to
-              // 'I liked this'
-              // additionally, on viewPost(get), add filter to determine if like button should be enabled
+              res.json({ n_likes: likes_obj.n_likes });
             }
           });
-          
-        } else {
-          // already liked
-          // on client end 
-          res.json({n_likes: 99999})
-        }
-        
       });
     });
 
@@ -224,7 +247,8 @@ module.exports = (app) => {
         spriteOffset: req.body.v_spriteOffset,
         content: req.body.v_content,
         n_likes: 0,
-        likes_by: []
+        likes_by: [],
+        comments: []
       }
       col_post.insertOne(content_obj, (err, r) => {
         if (err) { console.log("error inserting new post."); }
@@ -296,6 +320,35 @@ module.exports = (app) => {
         }
       });
       res.redirect('/api/posts');
+    });
+
+  // Add comment
+  app.route('/api/addComment')
+    .post((req, res) => {
+      console.log('Route:/api/addComment');
+      sess = req.session;
+      if (!sess.authUser) { return res.redirect('/api/login'); }
+      let col_post = db.collection('posts');
+      col_post.findOne({ _id: ObjectId(req.body.post_id) }, (err, post) => {
+        let comment = {
+          by_id: sess.authUser.uid,
+          //by_username: sess.authUser.username,
+          //by_avatar: sess.authUser.avatar,
+          comment: req.body.comment,
+          date: new Date()
+        }
+        post.comments.unshift(comment);
+        col_post.updateOne({ _id: ObjectId(req.body.post_id) },
+        { $set: {comments: post.comments} }, (err, r) => {
+          if (err) {
+            console.log("error updating post:", req.body.post_id);
+          } else {
+            console.log("Update post successful:", req.body.post_id);
+            res.json({status: 'ok'});
+          }
+        });
+      });
+      
     });
 
   // account page
