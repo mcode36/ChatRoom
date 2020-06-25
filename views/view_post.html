@@ -125,41 +125,22 @@
 
     <div class="post-data">
       <h2>Comments</h2>
-
+      {% for comment in post.comments %}
       <div class="comment-wrapper">
         <div class="row">
-          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
-          <div class="post-author">Tommy Clark</div>
+          <div class="post-avatar"><img alt="avatar" src="/uploads/avatar/{{comment.avatar}}"></div>
+          <div class="post-author">{{comment.username}}</div>
           <div class="grp-right">
-            <div class="post-date">December 25, 2020</div>
+            <div class="post-date">{{comment.d_string}}</div>
           </div>
         </div>
         <div class="comments">
-          some comments here.
+          {{comment.comment}}
         </div>
       </div>
-
-      <div class="comment-wrapper">
-        <div class="row">
-          <div class="post-avatar"><img alt="avatar" src="/public/img/avatar100x100.jpg"></div>
-          <div class="post-author">Tommy Clark</div>
-          <div class="grp-right">
-            <div class="post-date">December 25, 2020</div>
-          </div>
-        </div>
-        <div class="comments">
-          some comments here.
-        </div>
-      </div>
-
+      {% endfor %}
     </div>
-    {% for comment in post.comments %}
-    <div>{{comment.by_id}}</div>
-    <div>{{comment.username}}</div>
-    <div>{{comment.avatar}}</div>
-    <div>{{comment.comment}}</div>
-    <div>{{comment.date}}</div>
-    {% endfor %}
+
   </div>
 
   <div class="footer">
