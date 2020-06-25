@@ -41,6 +41,11 @@ module.exports = (app) => {
       console.log("Successful database connection");
     }
     db = client.db("hcc");
+    db.collection('posts').createIndex(
+      { title: "text", content: "text" }, function(err, result) {
+      if (err) { return console.log(err); }
+      console.log(result);
+    });
   });
 
   // nunjucks configuration
@@ -61,19 +66,15 @@ module.exports = (app) => {
   });
 
   // Test page
-  app.route('/test/:post_id')
+  app.route('/test')
     .get((req, res) => {
-      //res.sendFile(process.cwd() + '/views/tryRun/test_modal.html');
-
       let col_post = db.collection('posts');
-      col_post.updateOne({ _id: ObjectId(req.params.post_id) },
-        { $set: { n_likes: 0, likes_by: [] } }, (err, r) => {
-          if (err) { console.log("error updating post"); }
-          else {
-            console.log("reset likes to 0");
-            res.send('reset likes to 0')
-          }
+      col_post.find( { $text: { $search: "banner" } }, function (err, cursor) {
+        cursor.toArray(function (err, posts) {
+          if (err) return console.log(err);
+          res.send(posts);
         });
+      });
     });
 
   //Index page (static HTML)
@@ -95,8 +96,16 @@ module.exports = (app) => {
       sess = req.session;
       if (!sess.authUser) { return res.redirect('/api/login'); }
 
-      let col_account = db.collection('accounts');
-      let col_post = db.collection('posts');
+      // Pagination
+      const col_account = db.collection('accounts');
+      const col_post = db.collection('posts');
+      const posts_per_page = 5;
+      let page_n = 1;
+      if (req.query.page) {
+        page_n = parseInt(req.query.page);
+      }
+      let skip_n = posts_per_page * (page_n - 1);
+
       col_account.find({}).toArray((err, accounts) => {
         // build dictionary
         let uname_dict = {};
@@ -105,34 +114,54 @@ module.exports = (app) => {
           uname_dict[accounts[i]._id] = accounts[i].username;
           avatar_dict[accounts[i]._id] = accounts[i].avatar;
         }
-        
-        col_post.find({}).sort({ date: -1 }).toArray((err, posts) => {
-          if (err) { console.log("error retrieving posts."); }
-          // post processing posts array
-          for (let i = 0; i < posts.length; i++) {
-            // post processing date field
-            let d = new Date(posts[i].date);
-            let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
-            posts[i]['d_string'] = d_string;
-            // post processing content field
-            let text = '', x = 0;
-            let t = h2p(posts[i].content).split(' ');
-            while (true) {
-              text = text + t[x] + ' ';
-              x += 1;
-              if (x >= t.length) { break; }
-              if (text.length > 220) { text = text + '...'; break; }
-            }
-            // post processing object_position_style
-            posts[i]['object_position_style'] = 'object-position:' + posts[i]['spriteOffset'] + 'px 0px';
 
-            // post processing other variables
-            posts[i]['plain_text'] = text;
-            posts[i]['author'] = uname_dict[posts[i]['author_id']];
-            posts[i]['avatar'] = avatar_dict[posts[i]['author_id']];
+        let query_options = {
+          sort: { date: -1 },
+          limit: 5,
+          skip: skip_n
+        }
+        col_post.find({}, query_options, function (err, cursor) {
+          if (err) return console.log(err);
+          cursor.count(false, function (err, total_posts) {
+            if (err) return console.log(err);
+            cursor.toArray(function (err, posts) {
+              if (err) return console.log(err);
 
-          }
-          res.render('posts.html', { user: sess.authUser, posts: posts });
+              // set page object for rendering page
+              let max_page = Math.ceil(total_posts / posts_per_page);
+              let page = {
+                current: page_n,
+                total: max_page
+              };
+              if (page_n + 1 <= max_page) { page.next = page_n + 1; } else { page.next = 0 }
+              if (page_n - 1 >= 1) { page.prev = page_n - 1; } else { page.prev = 0 }
+
+              // post processing posts array
+              for (let i = 0; i < posts.length; i++) {
+                // post processing date field
+                let d = new Date(posts[i].date);
+                let d_string = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getDate() + ', ' + d.getFullYear();
+                posts[i]['d_string'] = d_string;
+                // post processing content field
+                let text = '', x = 0;
+                let t = h2p(posts[i].content).split(' ');
+                while (true) {
+                  text = text + t[x] + ' ';
+                  x += 1;
+                  if (x >= t.length) { break; }
+                  if (text.length > 220) { text = text + '...'; break; }
+                }
+                // post processing object_position_style
+                posts[i]['object_position_style'] = 'object-position:' + posts[i]['spriteOffset'] + 'px 0px';
+
+                // post processing other variables
+                posts[i]['plain_text'] = text;
+                posts[i]['author'] = uname_dict[posts[i]['author_id']];
+                posts[i]['avatar'] = avatar_dict[posts[i]['author_id']];
+              }
+              res.render('posts.html', { user: sess.authUser, posts: posts, page: page });
+            })
+          })
         });
       });
 
@@ -171,17 +200,19 @@ module.exports = (app) => {
           post.author_avatar = avatar_dict[post.author_id];
           // comments
           for (let i = 0; i < post.comments.length; i++) {
+            let d = new Date(post.comments[i].date);
+            post.comments[i].d_string = d.toLocaleString('en-US');
             post.comments[i].username = uname_dict[post.comments[i].by_id];
             post.comments[i].avatar = avatar_dict[post.comments[i].by_id];
           }
           res.render('view_post.html', { user: sess.authUser, post: post });
 
-          
+
         });
       });
 
 
-      
+
 
     })
 
@@ -339,16 +370,16 @@ module.exports = (app) => {
         }
         post.comments.unshift(comment);
         col_post.updateOne({ _id: ObjectId(req.body.post_id) },
-        { $set: {comments: post.comments} }, (err, r) => {
-          if (err) {
-            console.log("error updating post:", req.body.post_id);
-          } else {
-            console.log("Update post successful:", req.body.post_id);
-            res.json({status: 'ok'});
-          }
-        });
+          { $set: { comments: post.comments } }, (err, r) => {
+            if (err) {
+              console.log("error updating post:", req.body.post_id);
+            } else {
+              console.log("Update post successful:", req.body.post_id);
+              res.json({ status: 'ok' });
+            }
+          });
       });
-      
+
     });
 
   // account page
