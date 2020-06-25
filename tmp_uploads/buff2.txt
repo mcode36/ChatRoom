@@ -1,0 +1,13 @@
+  // Test page
+  app.route('/test/:page')
+    .get((req, res) => {
+      let page_n = req.params.page;
+      let col_post = db.collection('posts');
+      let skip_n = 5 * (page_n - 1);
+      let query_options = {
+        sort: { date: -1 },
+        limit: 5,
+        skip: skip_n
+      }
+      
+    });
