@@ -1,23 +1,22 @@
 # Section 1 : Major functions and routes
 
 ## Page: view_post.html
-v Edit Post
-  v enable Edit button when user == author
-  v Apply CKEditor to edit field
-v Delete Post (enabled when user == author)
-v Like button (enabled when user != author)
-v Add post category to display area
-v Comments
-  v Insert new comment
-  v Comment listing
+- Edit Post  ***done***
+  - enable Edit button when user == author  ***done***
+  - Apply CKEditor to edit field  ***done***
+- Delete Post (enabled when user == author)  ***done***
+- Like button (enabled when user != author)  ***done***
+- Add post category to display area  ***done***
+- Comments  ***done***
+  - Insert new comment  ***done***
+  - Comment listing  ***done***
 
 ## Page: posts.html
-v Add pagination
-
-- Add search function
-- Enable category filter on top nav bar
-v Update number of comments
-v Trim Title/contents to fit post window
+- Add pagination  ***done***
+- Add search function  ***done***
+- Enable category filter on top nav bar  ***done***
+- Update number of comments  ***done***
+- Trim Title/contents to fit post window  ***done***
 
 ## Image upload
 - disable multiple file upload (redundant)
@@ -29,8 +28,8 @@ v Trim Title/contents to fit post window
 
 ## Page: new_post.html
 - Adjust checkbox CSS
-v Add CKEditor to Content field
-v Deal with default banner and sprite offset
+- Add CKEditor to Content field  ***done***
+- Deal with default banner and sprite offset  ***done***
 
 ## Page: account.html
 - Add bounding bax around first part: Username/Email/Update My Account Info
