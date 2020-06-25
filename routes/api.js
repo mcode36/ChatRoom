@@ -41,11 +41,12 @@ module.exports = (app) => {
       console.log("Successful database connection");
     }
     db = client.db("hcc");
-    db.collection('posts').createIndex(
-      { title: "text", content: "text" }, function(err, result) {
-      if (err) { return console.log(err); }
-      console.log(result);
-    });
+    //// createIndex only need to run once at project setup
+    // db.collection('posts').createIndex(
+    //   { title: "text", content: "text" }, function(err, result) {
+    //   if (err) { return console.log(err); }
+    //   console.log(result);
+    // });
   });
 
   // nunjucks configuration
@@ -69,7 +70,7 @@ module.exports = (app) => {
   app.route('/test')
     .get((req, res) => {
       let col_post = db.collection('posts');
-      col_post.find( { $text: { $search: "banner" } }, function (err, cursor) {
+      col_post.find( { $text: { $search: "post banner" } }, function (err, cursor) {
         cursor.toArray(function (err, posts) {
           if (err) return console.log(err);
           res.send(posts);
@@ -115,12 +116,26 @@ module.exports = (app) => {
           avatar_dict[accounts[i]._id] = accounts[i].avatar;
         }
 
+        // query string (search, category conditions)
+        let query_string = {} // default
+        let page_qString = '';
+        if (req.query.cat) {
+          query_string = { category: req.query.cat }
+          page_qString = '&cat=' + req.query.cat;
+        }
+        // search function will overwrite category listing
+        if (req.query.search) {  
+          query_string = { $text: { $search: req.query.search } }
+          page_qString = '&search="' + req.query.search + '"';
+        }
+        
+        // query options
         let query_options = {
           sort: { date: -1 },
           limit: 5,
           skip: skip_n
         }
-        col_post.find({}, query_options, function (err, cursor) {
+        col_post.find(query_string, query_options, function (err, cursor) {
           if (err) return console.log(err);
           cursor.count(false, function (err, total_posts) {
             if (err) return console.log(err);
@@ -131,7 +146,8 @@ module.exports = (app) => {
               let max_page = Math.ceil(total_posts / posts_per_page);
               let page = {
                 current: page_n,
-                total: max_page
+                total: max_page,
+                qString: page_qString
               };
               if (page_n + 1 <= max_page) { page.next = page_n + 1; } else { page.next = 0 }
               if (page_n - 1 >= 1) { page.prev = page_n - 1; } else { page.prev = 0 }
