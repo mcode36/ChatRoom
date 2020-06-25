@@ -7,22 +7,25 @@ v Edit Post
 v Delete Post (enabled when user == author)
 v Like button (enabled when user != author)
 v Add post category to display area
-- Comments
-  - Insert new comment
-  - Comment listing
+v Comments
+  v Insert new comment
+  v Comment listing
 
 ## Page: posts.html
-- Add pagination
-- Bottom image to stay with bottom nav bar, make same width
+v Add pagination
+
 - Add search function
 - Enable category filter on top nav bar
-- Update number of comments
+v Update number of comments
 v Trim Title/contents to fit post window
 
 ## Image upload
 - disable multiple file upload (redundant)
 
 # Section 2 : Final touch on CSS
+
+## posts.html
+- Bottom image to stay with bottom nav bar, make same width
 
 ## Page: new_post.html
 - Adjust checkbox CSS
