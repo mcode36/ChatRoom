@@ -491,6 +491,21 @@ input[type=text], input[type=email], input[type=password], textarea, .form-row {
   max-width: 100%;
 }
 
+/* bootstrap modal classes
+modal fade
+modal-dialog
+modal-content
+modal-header
+modal-title
+close
+modal-body
+img-container
+modal-footer
+btn 
+btn-primary
+btn-secondary
+*/
+
 /* The Modal (background) */
 .mmodal {
   display: none; /* Hidden by default */
