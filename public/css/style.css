@@ -1,4 +1,7 @@
 
+:root {
+  --col-width: 300px;  
+}
 html {
   box-sizing: border-box;
 }
@@ -253,13 +256,13 @@ div.desc {
   min-height: 1px;
 }
 .col-center {
-  width: 300px; 
+  width: var(--col-width);
   float: left;
 }
 
 .col-center-300 {
   margin: 0px auto;
-  width: 300px; 
+  width: var(--col-width);
 }
 
 #profilePic {
@@ -579,4 +582,56 @@ btn-secondary
 }
 .mmodal-footer button{
   float: right;
+}
+#commentForm button{
+  float: right;
+}
+
+/* buttons */
+/* replacing:
+class="btn-shadow fullCol"
+btn-small
+*/
+.hcc-btn {
+  color: #519FE7;
+  background-color: #EFEFEF;
+  border: 1px solid #E0E0E0;
+  box-shadow: 3px 3px 3px 1px #CDCDCD;
+  outline: none;
+}
+.hcc-btn:hover {
+  cursor: pointer;
+  color: white;
+  background-color: #519FE7;
+}
+.hcc-btn:active {
+  color: #DEDEDE;
+  box-shadow: 1px 1px 3px 1px #CDCDCD;
+}
+.hcc-btn-disabled {
+  color: #BBBBBB;
+  background-color: #EFEFEF;
+  border: 1px solid #E0E0E0;
+  box-shadow: 3px 3px 3px 1px #CDCDCD;
+  outline: none;
+}
+
+.hcc-btn-std {
+  padding: 7px 20px;
+  border-radius: 8px;
+}
+.hcc-btn-sm {
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.8em;
+}
+.hcc-btn-fullCol {
+  width: 100%;
+  padding: 8px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 1.4em;
+}
+input:focus, textarea:focus, select:focus, button:focus{
+  outline: none;
 }
