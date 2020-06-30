@@ -80,19 +80,20 @@
     {% endfor %}
 
     <!-- pagination nav -->
-    <div> 
+    <div class="grp-right" style="margin: 0px 10px 10px 0px;"> 
       {% if page.prev > 0 %}
-        <button onClick="window.location.href='/api/posts?page={{page.prev}}{{page.qString}}'">&lt; prev</button>
+        <button class="hcc-btn hcc-btn-sm" onClick="window.location.href='/api/posts?page={{page.prev}}{{page.qString}}'">&lt; prev</button>
       {% else %}
-        <button disabled>&lt; prev</button>
+        <button class="hcc-btn-disabled hcc-btn-sm" disabled>&lt; prev</button>
       {% endif %}
-      page {{page.current}} of {{page.total}}
+      &nbsp;&nbsp;page {{page.current}} of {{page.total}}&nbsp;
       {% if page.next > 0 %}
-        <button onClick="window.location.href='/api/posts?page={{page.next}}{{page.qString}}'">next &gt;</button>
+        <button class="hcc-btn hcc-btn-sm" onClick="window.location.href='/api/posts?page={{page.next}}{{page.qString}}'">next &gt;</button>
       {% else %}
-        <button disabled>next &gt;</button>
+        <button class="hcc-btn-disabled hcc-btn-sm" disabled>next &gt;</button>
       {% endif %}
     </div>
+
 
     <div class="img-strip">
       <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
