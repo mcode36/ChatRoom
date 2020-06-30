@@ -69,13 +69,7 @@ module.exports = (app) => {
   // Test page
   app.route('/test')
     .get((req, res) => {
-      let col_post = db.collection('posts');
-      col_post.find( { $text: { $search: "post banner" } }, function (err, cursor) {
-        cursor.toArray(function (err, posts) {
-          if (err) return console.log(err);
-          res.send(posts);
-        });
-      });
+      res.sendFile(process.cwd() + '/views/tryRun/btn/button.html');
     });
 
   //Index page (static HTML)
