@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test Button CSS</title>
+<style>
+:root {
+  --col-width: 300px;  
+}
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+.hcc-btn {
+  color: #519FE7;
+  background-color: #EFEFEF;
+  border: 1px solid #E0E0E0;
+  box-shadow: 3px 3px 3px 1px #CDCDCD;
+  outline:none;
+}
+.hcc-btn:hover {
+  cursor: pointer;
+  color: white;
+  background-color: #519FE7;
+}
+.hcc-btn:active {
+  color: #DEDEDE;
+  box-shadow: 1px 1px 3px 1px #CDCDCD;
+}
+
+.hcc-btn-std {
+  padding: 7px 20px;
+  border-radius: 8px;
+}
+.hcc-btn-sm {
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.8em;
+}
+.hcc-btn-fullCol {
+  width: 90%;
+  padding: 8px 20px;
+  margin: 0px calc(var(--col-width) * 0.05);
+  border-radius: 8px;
+  font-size: 1.4em;
+}
+
+div.center-col {
+  width: var(--col-width);
+  height: 80px;
+  border: 1px dotted grey;
+}
+</style>
+  </head>
+  <body>
+  <button class="hcc-btn hcc-btn-sm">hcc-btn-sm</button>
+  <hr>
+  <button class="hcc-btn hcc-btn-std">hcc-btn-std</button>
+  <hr>
+  <div class="center-col">
+    <button class="hcc-btn hcc-btn-fullCol">hcc-btn-fullCol</button>
+  </div>
+  </body>
+  </html>
