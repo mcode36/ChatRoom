@@ -80,8 +80,8 @@
       <span id="n_likes">{{post.n_likes}}</span> people like this
       {% if post.isOwner %}
       <div class="grp-right">
-        <button class="btn-small" onClick="editPost()">Edit Post</button>
-        <button class="btn-small" onClick="delPostModal()">Delete Post</button>
+        <button class="hcc-btn hcc-btn-sm" onClick="editPost()">Edit Post</button>
+        <button class="hcc-btn hcc-btn-sm" onClick="delPostModal()">Delete Post</button>
       </div>
       {% endif %}
     </div>
@@ -101,7 +101,7 @@
         <div class="mmodal-footer">
           <form id="delForm" method="POST" action="/api/delPost">
             <input name="post_id" type="hidden" value={{post._id}}>
-            <button type="submit" class="btn-small">Confirm</button>
+            <button type="submit" class="hcc-btn hcc-btn-std">Confirm</button>
           </form>
         </div>
       </div>
@@ -116,7 +116,7 @@
       <form id="commentForm">
         <input type="hidden" id="post_id" name="post_id" value={{post._id}}>
         <textarea id="new-comment" name="new-comment"></textarea>
-        <button class="btn-shadow" onClick="addComment()">Submit</button>
+        <button class="hcc-btn hcc-btn-std" onClick="addComment()">Submit</button>
       </form>
     </div>
 
