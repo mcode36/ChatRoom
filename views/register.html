@@ -37,12 +37,16 @@
     <div class="col-center-300">
       
         <form method="POST">
-          <input type="text" id="v_uname" name="v_uname" placeholder="Username" required>
-          <input type="email" id="v_email" name="v_email" placeholder="Email" required>
-          <input type="password" id="v_passwd" name="v_passwd" placeholder="Password" required>
-          <input type="password" id="v_passwd2" name="v_passwd2" placeholder="Confirm Password" required>
+          <label class="field_label" for="v_uname">Username</label>
+          <input type="text" id="v_uname" name="v_uname" placeholder="John Doe" required>
+          <label class="field_label" for="v_email">Email</label>
+          <input type="email" id="v_email" name="v_email" placeholder="john_doe@abc.com" required>
+          <label class="field_label" for="v_passwd">Password</label>
+          <input type="password" id="v_passwd" name="v_passwd" required>
+          <label class="field_label" for="v_passwd2">Re-Enter Password</label>
+          <input type="password" id="v_passwd2" name="v_passwd2" required>
           
-          <button class="btn-shadow fullCol">Register</button>
+          <button class="hcc-btn hcc-btn-fullCol">Register</button>
         </form>
       
     </div>
