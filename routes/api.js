@@ -75,7 +75,12 @@ module.exports = (app) => {
   //Index page (static HTML)
   app.route('/')
     .get((req, res) => {
-      res.sendFile(process.cwd() + '/views/index.html');
+      //res.sendFile(process.cwd() + '/views/index.html');
+      sess = req.session;
+      let btn_text = 'Member Login';
+      if (sess.authUser) { btn_text = 'Enter'; }
+      console.log(btn_text);
+      res.render('index.html', {btn_text:btn_text});
     });
 
   // About page
@@ -620,10 +625,8 @@ module.exports = (app) => {
   app.route('/api/logout')
     .get((req, res) => {
       req.session.destroy();
-      res.sendFile(process.cwd() + '/views/index.html');
+      return res.redirect('/');
     });
-
-
 
   // Image upload
   app.post('/api/upload', (req, res) => {
