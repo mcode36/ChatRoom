@@ -22,33 +22,39 @@
       <h2>Welcome to the Home Chef’s Corner, a place for food lovers to share and
         exchange ideas about food, drinks, snacks, and more.</h2>
         <div class="col-center-300">
-          <button class="hcc-btn hcc-btn-fullCol" onClick="enter_site()">Enter</button>
+          <button class="hcc-btn hcc-btn-fullCol" onClick="enter_site()">{{btn_text}}</button>
         </div>
     </div>
+    <!--
+    <a href="/api/posts?cat=restaurants" class="navbar-item">Restaurants</a>
+    <a href="/api/posts?cat=recipes" class="navbar-item">Recipes</a>
+    <a href="/api/posts?cat=deals" class="navbar-item">Deals</a>
+    <a href="/api/posts?cat=cookwares" class="navbar-item">Cookwares</a>
+    -->
     <div class="category-row">
       <div class="category">
-        <a target="_blank" href="/public/img/img600x400_restaurants.jpg">
+        <a target="_blank" href="/api/posts?cat=restaurants">
           <img src="/public/img/img600x400_restaurants.jpg">
         </a>
         <div class="desc">Restaurants</div>
       </div>
       
       <div class="category">
-        <a target="_blank" href="/public/img/img600x400_recipes.jpg">
+        <a target="_blank" href="/api/posts?cat=recipes">
           <img src="/public/img/img600x400_recipes.jpg">
         </a>
         <div class="desc">Recipes</div>
       </div>
       
       <div class="category">
-        <a target="_blank" href="/public/img/img600x400_deals.jpg">
+        <a target="_blank" href="/api/posts?cat=deals">
           <img src="/public/img/img600x400_deals.jpg">
         </a>
         <div class="desc">Deals</div>
       </div>
       
       <div class="category">
-        <a target="_blank" href="/public/img/img600x400_cookwares.jpg">
+        <a target="_blank" href="/api/posts?cat=cookwares">
           <img src="/public/img/img600x400_cookwares.jpg">
         </a>
         <div class="desc">Cookwares</div>
@@ -56,7 +62,6 @@
     </div>
     <div class="footer">
       <div class="footer-item" onclick="about()">About</div>
-      <div class="footer-item">FAQ</div>
     </div>
 
   <script>
