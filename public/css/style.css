@@ -9,6 +9,10 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  margin: 8px;
+}
+
 h2 {
   font-family: 'Roboto', sans-serif;
 }
@@ -143,6 +147,17 @@ h2 {
   }
 }
 
+input[type=text], input[type=email], input[type=password], textarea, .form-row {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  background-color: #FCFCFC;
+  border-radius: 4px;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+} 
+
 div.category {
   margin: 5px;
   border: 1px solid #ccc;
@@ -180,20 +195,25 @@ div.desc {
   color: #EEEEEE;
   margin: 10px 0px 10px 20px;
   float: left;
+  text-decoration: none;
 }
 .navbar-item:hover {
-  color: #BBBBBB;
+  color: rgb(247, 240, 176);
   cursor: pointer;
 }
 
 .navbar-search {
   margin: 10px 20px 10px 0px;
-  padding: 5px 10px;
   border: 1px solid #E5E5E5;
   background-color: #D5D5D5;
   min-width: 150px;
   border-radius: 5px;
   float: right;
+}
+.navbar-search input{
+  margin: 0px;
+  padding: 5px;
+  border: none;
 }
 
 .footer {
@@ -218,7 +238,7 @@ div.desc {
 
 /* section: post-container */
 .hcc_container {
-  width: 812px;
+  width: 802px;
   margin: 20px auto;
   overflow: auto;
 }
@@ -242,7 +262,7 @@ div.desc {
 }
 
 .col-right {
-  width: 630px;
+  width: 618px;
   height: 100%;
   margin-left: 10px;
   float: left;
@@ -360,7 +380,7 @@ div.desc {
 
 /* section: post-form */
 .form-container {
-  width: 812px;
+  width: 800px;
   overflow: auto;
   margin: 0px auto;
   padding: 5px 20px 15px 20px;
@@ -455,16 +475,7 @@ div.desc {
   color: gray;
 }
 
-input[type=text], input[type=email], input[type=password], textarea, .form-row {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  background-color: #FCFCFC;
-  border-radius: 4px;
-  margin-top: 6px;
-  margin-bottom: 16px;
-  resize: vertical;
-} 
+
 
 .field_label {
   font-family: 'Roboto', sans-serif;
