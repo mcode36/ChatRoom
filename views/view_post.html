@@ -38,17 +38,15 @@
   </div>
 
   <div class="navbar">
-    <div class="navbar-item">Restaurants</div>
-    <div class="navbar-item">Recipes</div>
-    <div class="navbar-item">Deals</div>
-    <div class="navbar-item">Cookwares</div>
+    <a href="/api/posts" class="navbar-item">All</a>
+    <a href="/api/posts?cat=restaurants" class="navbar-item">Restaurants</a>
+    <a href="/api/posts?cat=recipes" class="navbar-item">Recipes</a>
+    <a href="/api/posts?cat=deals" class="navbar-item">Deals</a>
+    <a href="/api/posts?cat=cookwares" class="navbar-item">Cookwares</a>
   </div>
 
   <div class="img-strip">
-    <!-- default banner
-      <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
-    -->
-    <img id="bot-deco-img" alt="Bottom Decoration Image" src="/uploads/banner/{{post.banner_img}}">
+    <img src="/uploads/banner/{{post.banner_img}}">
   </div>
 
   <div class="hcc_container">
