@@ -36,7 +36,7 @@
         <a href="/api/logout">Logout</a>
       </div>
     </div>
-  </div> 
+  </div>
 
   <div class="navbar">
     <a href="/api/posts" class="navbar-item">All</a>
@@ -49,14 +49,13 @@
     </div>
   </div>
 
-  
+
   <div class="hcc_container">
     {% for post in posts %}
     <div class="post">
       <a href="/api/view_post/{{post._id}}">
-        <img class="post_image" alt="post_image" 
-		    style="{{post.object_position_style}}"
-        src="/uploads/banner/{{post.banner_img}}">
+        <img class="post_image" alt="post_image" style="{{post.object_position_style}}"
+          src="/uploads/banner/{{post.banner_img}}">
       </a>
       <div class="col-right">
         <div class="post-row post-title">
@@ -72,7 +71,7 @@
           <div class="post-comments-count">{{post.comments.length}}</div>
           <div class="grp-right">
             <div class="post-date">{{post.d_string}} / {{post.category}}</div>
-            
+
           </div>
         </div>
       </div>
@@ -80,26 +79,30 @@
     {% endfor %}
 
     <!-- pagination nav -->
-    <div class="grp-right" style="margin: 0px 10px 10px 0px;"> 
+    <div class="grp-right" style="margin: 0px 10px 10px 0px;">
       {% if page.prev > 0 %}
-        <button class="hcc-btn hcc-btn-sm" onClick="window.location.href='/api/posts?page={{page.prev}}{{page.qString}}'">&lt; prev</button>
+      <button class="hcc-btn hcc-btn-sm"
+        onClick="window.location.href='/api/posts?page={{page.prev}}{{page.qString}}'">&lt; prev</button>
       {% else %}
-        <button class="hcc-btn-disabled hcc-btn-sm" disabled>&lt; prev</button>
+      <button class="hcc-btn-disabled hcc-btn-sm" disabled>&lt; prev</button>
       {% endif %}
       &nbsp;&nbsp;page {{page.current}} of {{page.total}}&nbsp;
       {% if page.next > 0 %}
-        <button class="hcc-btn hcc-btn-sm" onClick="window.location.href='/api/posts?page={{page.next}}{{page.qString}}'">next &gt;</button>
+      <button class="hcc-btn hcc-btn-sm"
+        onClick="window.location.href='/api/posts?page={{page.next}}{{page.qString}}'">next &gt;</button>
       {% else %}
-        <button class="hcc-btn-disabled hcc-btn-sm" disabled>next &gt;</button>
+      <button class="hcc-btn-disabled hcc-btn-sm" disabled>next &gt;</button>
       {% endif %}
     </div>
 
 
-    <div class="img-strip">
-      <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
-    </div>
+    
+  </div>
+  <div class="img-strip">
+    <img id="bot-deco-img" alt="Bottom Decoration Image" src="/public/img/posts/812x250/green_leaves.jpg">
   </div>
   <div class="footer">
+    
     <div class="footer-item">About</div>
     <div class="footer-item">FAQ</div>
   </div>
@@ -109,12 +112,12 @@
     crossorigin="anonymous"></script>
   <script>
     const search_field = document.getElementById("search");
-    search_field.onchange = function() {search_post()};
+    search_field.onchange = function () { search_post() };
 
-function search_post() {
-  let url = '/api/posts?search="' + search_field.value + '"' ;
-  window.location = url;
-}
+    function search_post() {
+      let url = '/api/posts?search="' + search_field.value + '"';
+      window.location = url;
+    }
   </script>
 </body>
 
