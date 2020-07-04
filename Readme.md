@@ -97,5 +97,5 @@
   - press 'like' button on any reply will update the DB and increment the value of 'likes' by one
     Form field: _id(reply_id)
 
-  API route: /api/replies/{post_id}. Method: Delete
-  - Owner of the reply can delete it. Form field: _id(reply_id)
+  API route: /api/delPost. Method: Post
+  - Owner of the post can delete it. Form field: _id(reply_id)
