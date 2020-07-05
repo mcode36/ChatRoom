@@ -36,3 +36,4 @@
       expect: pop up alert on client
     - send correct password reset code
       expect: be redirected to /api/account page
+	  
