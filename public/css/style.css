@@ -295,6 +295,12 @@ div.desc {
   cursor: pointer;
  }
 
+#acntUpdateForm {
+  border: 1px solid #CCCCCC;
+  border-radius: 10px;
+  padding: 20px;
+}
+
 
 
 .post-title {
@@ -485,6 +491,11 @@ div.desc {
 .cb_label {
   font-family: 'Roboto', sans-serif;
   font-size: 0.9em;
+  margin-left: 5px;
+  margin-right: 15px;
+}
+input[type=checkbox] {
+  margin-top: 3px;
 }
 
 /* Cropper.js */
