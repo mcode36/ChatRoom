@@ -1,10 +1,10 @@
 {
-  "name": "chat-room-app",
+  "name": "home-chef-circle",
   "version": "0.0.1",
-  "description": "A light weight chat room app",
+  "description": "Home Chef Circle, Blog using Node.js",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
