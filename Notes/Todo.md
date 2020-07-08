@@ -24,21 +24,21 @@
 # Section 2 : Final touch on CSS
 
 ## posts.html
-- Bottom image to stay with bottom nav bar, make same width
+- Bottom image to stay with bottom nav bar ***done***
 
 ## Page: new_post.html
-- Adjust checkbox CSS
+- Adjust checkbox CSS ***done***
 - Add CKEditor to Content field  ***done***
 - Deal with default banner and sprite offset  ***done***
 
 ## Page: account.html
-- Add bounding bax around first part: Username/Email/Update My Account Info
+- Add bounding box around first part: Username/Email/Update My Account Info ***done***
 
 ## Page: register.html
-- Add field labels
+- Add field labels ***done***
 
 ## Form
-- Make unique look for all input fields
+- Make unique look for all input fields ***done***
   - login.html
   - register.html
   - passwd_reset.html
